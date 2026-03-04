@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle Linha 06 LP</title>
+<style>
+:root {
+--primary-color: #2c3e50;
+--accent-color: #3498db;
+--success-color: #27ae60;
+--bg-color: #f4f7f6;
+--card-bg: #ffffff;
+--border-color: #ddd;
+--header-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background-color: var(--bg-color);
+padding: 20px;
+color: #333;
+}
+/* ===== TELA DE LOGIN ===== */
+#loginScreen {
+position: fixed;
+top: 0; left: 0;
+width: 100%; height: 100%;
+background: var(--header-bg);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 2000;
+padding: 20px;
+}
+#loginScreen.hidden { display: none; }
+.login-card {
+background: white;
+padding: 40px;
+border-radius: 15px;
+box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+max-width: 400px;
+width: 100%;
+text-align: center;
+}
+.login-logo { font-size: 3rem; margin-bottom: 20px; }
+.login-title { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 10px; font-weight: bold; }
+.login-subtitle { color: #7f8c8d; margin-bottom: 30px; font-size: 0.95rem; }
+.login-input {
+width: 100%;
+padding: 15px;
+border: 2px solid var(--border-color);
+border-radius: 8px;
+font-size: 1rem;
+margin-bottom: 15px;
+transition: border-color 0.3s;
+}
+.login-input:focus {
+outline: none;
+border-color: var(--accent-color);
+box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+.login-btn {
+width: 100%;
+padding: 15px;
+background: var(--header-bg);
+color: white;
+border: none;
+border-radius: 8px;
+font-size: 1rem;
+font-weight: bold;
+cursor: pointer;
+transition: transform 0.2s, box-shadow 0.2s;
+}
+.login-btn:hover {
+transform: translateY(-2px);
+box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+.login-error {
+color: #e74c3c;
+font-size: 0.9rem;
+margin-top: 15px;
+display: none;
+}
+.login-error.show { display: block; }
+/* ===== APP PRINCIPAL ===== */
+#appScreen { display: none; }
+#appScreen.visible { display: block; }
+header {
+text-align: center;
+margin-bottom: 30px;
+background: var(--header-bg);
+color: white;
+padding: 25px;
+border-radius: 10px;
+box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+position: relative;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 20px;
+}
+.header-left {
+display: flex;
+align-items: center;
+gap: 15px;
+}
+.header-logo {
+width: 80px;
+height: 80px;
+object-fit: contain;
+border-radius: 10px;
+background-color: rgba(255,255,255,0.15);
+padding: 8px;
+border: 2px solid rgba(255,255,255,0.3);
+}
+.header-center {
+flex: 1;
+text-align: center;
+}
+.header-center h1 { margin: 0; font-size: 2rem; }
+.header-center p { margin: 10px 0 0; opacity: 0.9; }
+.header-actions {
+display: flex;
+align-items: center;
+gap: 15px;
+}
+.user-info {
+font-size: 0.9rem;
+background-color: rgba(255,255,255,0.2);
+padding: 5px 12px;
+border-radius: 20px;
+}
+.btn-logout {
+background-color: rgba(255,255,255,0.3);
+color: white;
+border: none;
+padding: 8px 15px;
+border-radius: 20px;
+cursor: pointer;
+font-size: 0.85rem;
+transition: background-color 0.3s;
+}
+.btn-logout:hover { background-color: rgba(255,255,255,0.5); }
+.save-status {
+position: absolute;
+bottom: 10px;
+right: 20px;
+background-color: rgba(255,255,255,0.3);
+padding: 5px 12px;
+border-radius: 20px;
+font-size: 0.8rem;
+display: flex;
+align-items: center;
+gap: 5px;
+}
+.save-dot {
+width: 10px; height: 10px;
+background-color: #2ecc71;
+border-radius: 50%;
+animation: pulse 2s infinite;
+}
+@keyframes pulse {
+0% { opacity: 1; transform: scale(1); }
+50% { opacity: 0.5; transform: scale(0.8); }
+100% { opacity: 1; transform: scale(1); }
+}
+.container { max-width: 1400px; margin: 0 auto; }
+.input-panel {
+background-color: var(--card-bg);
+padding: 25px;
+border-radius: 10px;
+box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+margin-bottom: 30px;
+}
+.form-section {
+margin-bottom: 25px;
+padding-bottom: 20px;
+border-bottom: 2px solid #ecf0f1;
+}
+.form-section:last-child {
+border-bottom: none;
+margin-bottom: 0;
+padding-bottom: 0;
+}
+.form-section h3 {
+color: var(--primary-color);
+margin-top: 0;
+margin-bottom: 15px;
+font-size: 1.2rem;
+}
+.form-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap: 15px;
+}
+.form-group { display: flex; flex-direction: column; }
+label {
+font-size: 0.9rem;
+font-weight: 600;
+margin-bottom: 5px;
+color: var(--primary-color);
+}
+input, select {
+padding: 12px;
+border: 2px solid var(--border-color);
+border-radius: 5px;
+font-size: 0.95rem;
+transition: border-color 0.3s;
+width: 100%;
+cursor: pointer;
+}
+input:focus, select:focus {
+outline: none;
+border-color: var(--accent-color);
+box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+input[type="date"] {
+font-family: inherit;
+color: var(--primary-color);
+font-weight: bold;
+cursor: pointer;
+}
+input[type="password"] {
+cursor: text;
+letter-spacing: 2px;
+}
+select { background-color: #fff; }
+select option { padding: 10px; }
+.btn {
+padding: 12px 25px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-weight: bold;
+font-size: 1rem;
+transition: all 0.3s;
+}
+.btn-add {
+background: var(--header-bg);
+color: white;
+width: 100%;
+margin-top: 10px;
+font-size: 1.1rem;
+padding: 15px;
+}
+.btn-add:hover {
+transform: translateY(-2px);
+box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+.btn-delete {
+background-color: #e74c3c;
+color: white;
+padding: 6px 12px;
+font-size: 0.85rem;
+}
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+.date-filter-panel {
+background-color: #e8f4fd;
+padding: 15px 20px;
+border-radius: 8px;
+margin-bottom: 20px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+flex-wrap: wrap;
+gap: 15px;
+border: 1px solid #b6e4fe;
+}
+.filter-group {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+.filter-group label {
+margin: 0;
+font-weight: bold;
+color: #2980b9;
+font-size: 1rem;
+}
+.machines-container {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+gap: 20px;
+}
+.machine-card {
+background-color: var(--card-bg);
+border-radius: 10px;
+overflow: hidden;
+box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+border-top: 5px solid var(--accent-color);
+transition: all 0.3s ease;
+}
+.machine-card:hover {
+transform: translateY(-3px);
+box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+.machine-header {
+background: var(--header-bg);
+color: white;
+padding: 15px 20px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+flex-wrap: wrap;
+gap: 10px;
+}
+.machine-info {
+display: flex;
+flex-direction: column;
+gap: 5px;
+}
+.machine-model { font-weight: bold; font-size: 1.3rem; }
+.machine-number {
+font-size: 0.9rem;
+background-color: rgba(255,255,255,0.3);
+padding: 2px 8px;
+border-radius: 4px;
+display: inline-block;
+font-weight: 500;
+}
+.machine-date-badge {
+background-color: rgba(255,255,255,0.2);
+padding: 4px 10px;
+border-radius: 15px;
+font-size: 0.85rem;
+}
+.machine-body { padding: 20px; }
+.section-title {
+font-size: 0.9rem;
+font-weight: bold;
+color: var(--primary-color);
+margin: 15px 0 10px;
+padding-bottom: 5px;
+border-bottom: 2px solid #ecf0f1;
+}
+.operator-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 12px;
+}
+.operator-item {
+background-color: #f8f9fa;
+padding: 12px;
+border-radius: 5px;
+border-left: 4px solid var(--accent-color);
+}
+.operator-label { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 5px; }
+.operator-name { font-weight: 600; color: #2c3e50; font-size: 0.95rem; word-break: break-word; }
+.actions {
+padding: 15px 20px;
+background-color: #f8f9fa;
+text-align: right;
+border-top: 1px solid #ecf0f1;
+}
+.pos-right { border-left-color: #e74c3c !important; }
+.pos-left { border-left-color: #9b59b6 !important; }
+.pos-back-right { border-left-color: #f39c12 !important; }
+.pos-back-left { border-left-color: #1abc9c !important; }
+.pos-autolub-right { border-left-color: #3498db !important; }
+.pos-autolub-left { border-left-color: #2ecc71 !important; }
+.badge {
+display: inline-block;
+padding: 3px 8px;
+border-radius: 3px;
+font-size: 0.7rem;
+font-weight: bold;
+}
+.badge-right { background-color: #ffebee; color: #c62828; }
+.badge-left { background-color: #f3e5f5; color: #7b1fa2; }
+.badge-back { background-color: #fff3e0; color: #ef6c00; }
+.badge-autolub { background-color: #e3f2fd; color: #1565c0; }
+.empty-state {
+grid-column: 1 / -1;
+text-align: center;
+padding: 60px 20px;
+color: #7f8c8d;
+background-color: #fff;
+border-radius: 10px;
+border: 2px dashed #bdc3c7;
+}
+.stats-bar {
+background-color: #fff;
+padding: 15px 20px;
+border-radius: 8px;
+margin-bottom: 20px;
+display: flex;
+justify-content: space-around;
+flex-wrap: wrap;
+gap: 15px;
+box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.stat-item { text-align: center; }
+.stat-number {
+font-size: 1.5rem;
+font-weight: bold;
+color: var(--accent-color);
+}
+.stat-label { font-size: 0.85rem; color: #7f8c8d; }
+.machine-number-input {
+background-color: #fff3cd;
+border-color: #ffc107 !important;
+}
+.machine-number-input:focus {
+border-color: #ff9800 !important;
+box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2) !important;
+}
+.operator-select {
+background-color: #e8f8f5;
+border-color: #1abc9c !important;
+}
+.operator-select:focus {
+border-color: #16a085 !important;
+box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.2) !important;
+}
+.custom-operator { display: none; margin-top: 10px; }
+.custom-operator.show { display: block; }
+.firebase-status {
+position: fixed;
+bottom: 20px; right: 20px;
+background-color: white;
+padding: 10px 20px;
+border-radius: 8px;
+box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 0.9rem;
+z-index: 100;
+}
+.firebase-status.connected { border-left: 4px solid #27ae60; }
+.firebase-status.error { border-left: 4px solid #e74c3c; }
+@media (max-width: 768px) {
+header {
+flex-direction: column;
+gap: 15px;
+}
+.header-left, .header-center, .header-actions {
+width: 100%;
+justify-content: center;
+}
+.header-logo {
+width: 60px;
+height: 60px;
+}
+.machines-container { grid-template-columns: 1fr; }
+.operator-grid { grid-template-columns: 1fr; }
+.date-filter-panel { flex-direction: column; align-items: stretch; }
+.header-actions { position: static; margin-top: 15px; justify-content: center; }
+.save-status { position: static; margin-top: 10px; justify-content: center; }
+}
+</style>
+</head>
+<body>
+<!-- ===== TELA DE LOGIN ===== -->
+<div id="loginScreen">
+<div class="login-card">
+<div class="login-logo">🏭</div>
+<h2 class="login-title">Linha 06 LP</h2>
+<p class="login-subtitle">Controle de Produção</p>
+<input type="text" id="loginUser" class="login-input" placeholder="Usuário" autocomplete="username">
+<input type="password" id="loginPass" class="login-input" placeholder="Senha" autocomplete="current-password" onkeypress="handleLoginKeyPress(event)">
+<button class="login-btn" onclick="doLogin()">🔐 Entrar</button>
+<p class="login-error" id="loginError">Usuário ou senha incorretos!</p>
+</div>
+</div>
+
+<!-- ===== APP PRINCIPAL ===== -->
+<div id="appScreen">
+<header>
+<!-- LADO ESQUERDO - LOGO CARREGADEIRA -->
+<div class="header-left">
+<img src="./img/carregadeira.jpg" alt="Logo Carregadeira" class="header-logo">
+</div>
+
+<!-- CENTRO - TÍTULO -->
+<div class="header-center">
+<h1>🏭 Linha 06 LP</h1>
+<p>Controle de Produção MWL</p>
+</div>
+
+<!-- LADO DIREITO - AÇÕES -->
+<div class="header-actions">
+<span class="user-info">👤 <span id="currentUser">Usuário</span></span>
+<button class="btn-logout" onclick="doLogout()">🚪 Sair</button>
+</div>
+
+<!-- STATUS DE SALVAMENTO -->
+<div class="save-status">
+<div class="save-dot"></div>
+<span id="saveText">✅ Salvo na Nuvem</span>
+</div>
+</header>
+
+<div class="container">
+<!-- Barra de Estatísticas (SEM TURNO) -->
+<div class="stats-bar">
+<div class="stat-item">
+<div class="stat-number" id="totalMachines">0</div>
+<div class="stat-label">Total de Máquinas Feitas</div>
+</div>
+<div class="stat-item">
+<div class="stat-number" id="todayMachines">0</div>
+<div class="stat-label">Máquinas Produzidas Hoje</div>
+</div>
+<div class="stat-item">
+<div class="stat-number" id="storageStatus">OK</div>
+<div class="stat-label">Firebase</div>
+</div>
+</div>
+
+<!-- Filtro de Data (SEM FILTRO DE TURNO) -->
+<div class="date-filter-panel">
+<div class="filter-group">
+<label for="filterDate">📅 Visualizar Dia:</label>
+<input type="date" id="filterDate" onchange="renderMachines()">
+</div>
+<div style="font-size: 0.9rem; color: #7f8c8d;">
+* Todas as máquinas do dia selecionado
+</div>
+</div>
+
+<!-- Formulário de Entrada (SEM TURNO) -->
+<div class="input-panel">
+<div class="form-section">
+<h3>📅 Data do Trabalho</h3>
+<div class="form-grid">
+<div class="form-group">
+<label for="workDate">Dia Trabalhado</label>
+<input type="date" id="workDate">
+</div>
+</div>
+</div>
+
+<div class="form-section">
+<h3>📋 Identificação da Máquina</h3>
+<div class="form-grid">
+<div class="form-group">
+<label for="machineModel">Modelo da Máquina</label>
+<select id="machineModel">
+<option value="">Selecione o modelo...</option>
+<option value="TN2">TN2</option>
+<option value="TN3-GC">TN3-GC</option>
+<option value="LN6">LN6</option>
+<option value="J8R">J8R</option>
+<option value="E5F-XE">E5F-XE</option>
+<option value="TN7-GC">TN7-GC</option>
+<option value="FL6-XE">FL6-XE</option>
+<option value="CXS-80">CXS-80</option>
+</select>
+</div>
+<div class="form-group">
+<label for="machineNumber">Número da Máquina</label>
+<input type="text" id="machineNumber" class="machine-number-input" placeholder="Ex: 001, 015, A-12">
+</div>
+</div>
+</div>
+
+<div class="form-section">
+<h3>👥 Operadores - Posições Principais</h3>
+<div class="form-grid">
+<div class="form-group">
+<label for="opRight">🔴 Lado Direito</label>
+<select id="opRight" class="operator-select" onchange="checkCustomOperator(this, 'customRight')">
+<option value="">Selecione o operador...</option>
+<option value="Willians">Willians</option>
+<option value="Moi">Moi</option>
+<option value="Carrera">Carrera</option>
+<option value="Caua">Caua</option>
+<option value="Ulisse">Ulisse</option>
+<option value="outro">➕ Outro (digitar nome)</option>
+</select>
+<input type="text" id="customRight" class="custom-operator" placeholder="Digite o nome do operador">
+</div>
+<div class="form-group">
+<label for="opLeft">🟣 Lado Esquerdo</label>
+<select id="opLeft" class="operator-select" onchange="checkCustomOperator(this, 'customLeft')">
+<option value="">Selecione o operador...</option>
+<option value="Willians">Willians</option>
+<option value="Moi">Moi</option>
+<option value="Carrera">Carrera</option>
+<option value="Caua">Caua</option>
+<option value="Ulisse">Ulisse</option>
+<option value="outro">➕ Outro (digitar nome)</option>
+</select>
+<input type="text" id="customLeft" class="custom-operator" placeholder="Digite o nome do operador">
+</div>
+<div class="form-group">
+<label for="opBackRight">🟠 Trás Direito</label>
+<select id="opBackRight" class="operator-select" onchange="checkCustomOperator(this, 'customBackRight')">
+<option value="">Selecione o operador...</option>
+<option value="Willians">Willians</option>
+<option value="Moi">Moi</option>
+<option value="Carrera">Carrera</option>
+<option value="Caua">Caua</option>
+<option value="Ulisse">Ulisse</option>
+<option value="outro">➕ Outro (digitar nome)</option>
+</select>
+<input type="text" id="customBackRight" class="custom-operator" placeholder="Digite o nome do operador">
+</div>
+<div class="form-group">
+<label for="opBackLeft">🟢 Trás Esquerdo</label>
+<select id="opBackLeft" class="operator-select" onchange="checkCustomOperator(this, 'customBackLeft')">
+<option value="">Selecione o operador...</option>
+<option value="Willians">Willians</option>
+<option value="Moi">Moi</option>
+<option value="Carrera">Carrera</option>
+<option value="Caua">Caua</option>
+<option value="Ulisse">Ulisse</option>
+<option value="outro">➕ Outro (digitar nome)</option>
+</select>
+<input type="text" id="customBackLeft" class="custom-operator" placeholder="Digite o nome do operador">
+</div>
+</div>
+</div>
+
+<div class="form-section">
+<h3>🔧 Montar Auto Lub</h3>
+<div class="form-grid">
+<div class="form-group">
+<label for="opAutoLubRight">🔵 Auto Lub Lado Direito</label>
+<select id="opAutoLubRight" class="operator-select" onchange="checkCustomOperator(this, 'customAutoLubRight')">
+<option value="">Selecione o operador...</option>
+<option value="Willians">Willians</option>
+<option value="Moi">Moi</option>
+<option value="Carrera">Carrera</option>
+<option value="Caua">Caua</option>
+<option value="Ulisse">Ulisse</option>
+<option value="outro">➕ Outro (digitar nome)</option>
+</select>
+<input type="text" id="customAutoLubRight" class="custom-operator" placeholder="Digite o nome do operador">
+</div>
+<div class="form-group">
+<label for="opAutoLubLeft">🟢 Auto Lub Lado Esquerdo</label>
+<select id="opAutoLubLeft" class="operator-select" onchange="checkCustomOperator(this, 'customAutoLubLeft')">
+<option value="">Selecione o operador...</option>
+<option value="Willians">Willians</option>
+<option value="Moi">Moi</option>
+<option value="Carrera">Carrera</option>
+<option value="Caua">Caua</option>
+<option value="Ulisse">Ulisse</option>
+<option value="outro">➕ Outro (digitar nome)</option>
+</select>
+<input type="text" id="customAutoLubLeft" class="custom-operator" placeholder="Digite o nome do operador">
+</div>
+</div>
+</div>
+
+<button class="btn btn-add" onclick="addMachine()" id="btnAddMachine">
+✅ ADICIONAR MÁQUINA À LINHA
+</button>
+</div>
+
+<!-- Lista de Máquinas -->
+<div id="machinesList" class="machines-container"></div>
+</div>
+
+<!-- Status Firebase -->
+<div class="firebase-status" id="firebaseStatus">
+<span id="firebaseStatusText">🔄 Conectando...</span>
+</div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script>
+// ============================================
+// CONFIGURAÇÃO DE USUÁRIOS E SENHAS
+// ============================================
+const USERS = {
+'operador': 'b3BlcmFkb3IxMjM=',  // operador123
+'admin': 'YWRtaW4yMDI0'           // admin2024
+};
+
+// ============================================
+// CONFIGURAÇÃO DO FIREBASE
+// ============================================
+const firebaseConfig = {
+apiKey: "AIzaSyCYII9KS9Sro0h_pmiXErAVi_42qeq4WlE",
+authDomain: "lp-34197.firebaseapp.com",
+projectId: "lp-34197",
+storageBucket: "lp-34197.firebasestorage.app",
+messagingSenderId: "1005341356831",
+appId: "1:1005341356831:web:96a8d7a8fc51311d04762a"
+};
+
+let db;
+let firebaseInitialized = false;
+let currentUser = null;
+
+try {
+firebase.initializeApp(firebaseConfig);
+db = firebase.firestore();
+firebaseInitialized = true;
+updateFirebaseStatus(true, '✅ Conectado');
+} catch (error) {
+console.error('❌ Erro Firebase:', error);
+updateFirebaseStatus(false, '❌ Erro');
+}
+
+// ============================================
+// VARIÁVEIS GLOBAIS
+// ============================================
+let machinesData = [];
+const COLLECTION_NAME = 'maquinas_linha06';
+
+// ============================================
+// INICIALIZAÇÃO
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+const savedUser = localStorage.getItem('linha06_user');
+if (savedUser) {
+currentUser = savedUser;
+showApp();
+setTodayDate();
+if (firebaseInitialized) loadData();
+updateStats();
+}
+});
+
+// ============================================
+// FUNÇÕES DE LOGIN
+// ============================================
+function handleLoginKeyPress(event) {
+if (event.key === 'Enter') doLogin();
+}
+
+function doLogin() {
+const user = document.getElementById('loginUser').value.trim();
+const pass = document.getElementById('loginPass').value;
+const errorEl = document.getElementById('loginError');
+
+if (USERS[user] && atob(USERS[user]) === pass) {
+currentUser = user;
+localStorage.setItem('linha06_user', user);
+document.getElementById('loginScreen').classList.add('hidden');
+document.getElementById('appScreen').classList.add('visible');
+document.getElementById('currentUser').textContent = user === 'admin' ? 'Administrador' : 'Operador';
+setTodayDate();
+if (firebaseInitialized) loadData();
+updateStats();
+} else {
+errorEl.classList.add('show');
+document.getElementById('loginPass').value = '';
+document.getElementById('loginPass').focus();
+}
+}
+
+function doLogout() {
+if (confirm('Deseja realmente sair?')) {
+currentUser = null;
+localStorage.removeItem('linha06_user');
+document.getElementById('loginScreen').classList.remove('hidden');
+document.getElementById('appScreen').classList.remove('visible');
+document.getElementById('loginUser').value = '';
+document.getElementById('loginPass').value = '';
+document.getElementById('loginError').classList.remove('show');
+}
+}
+
+function showApp() {
+document.getElementById('loginScreen').classList.add('hidden');
+document.getElementById('appScreen').classList.add('visible');
+}
+
+// ============================================
+// FUNÇÕES DO APP
+// ============================================
+function updateFirebaseStatus(connected, message) {
+const statusEl = document.getElementById('firebaseStatus');
+const statusTextEl = document.getElementById('firebaseStatusText');
+statusEl.className = 'firebase-status ' + (connected ? 'connected' : 'error');
+statusTextEl.textContent = message;
+}
+
+function setTodayDate() {
+const today = new Date();
+const year = today.getFullYear();
+const month = String(today.getMonth() + 1).padStart(2, '0');
+const day = String(today.getDate()).padStart(2, '0');
+const todayString = year + '-' + month + '-' + day;
+
+document.getElementById('workDate').value = todayString;
+document.getElementById('filterDate').value = todayString;
+}
+
+function checkCustomOperator(selectElement, customInputId) {
+const customInput = document.getElementById(customInputId);
+if (selectElement.value === 'outro') {
+customInput.classList.add('show');
+customInput.focus();
+} else {
+customInput.classList.remove('show');
+customInput.value = '';
+}
+}
+
+function getOperatorValue(selectId, customInputId) {
+const select = document.getElementById(selectId);
+const customInput = document.getElementById(customInputId);
+
+if (select.value === 'outro' && customInput.value.trim() !== '') {
+return customInput.value.trim();
+} else if (select.value !== '' && select.value !== 'outro') {
+return select.value;
+}
+return 'Não atribuído';
+}
+
+// ============================================
+// CRUD MÁQUINAS
+// ============================================
+async function addMachine() {
+const model = document.getElementById('machineModel').value;
+const machineNumber = document.getElementById('machineNumber').value.trim();
+const workDate = document.getElementById('workDate').value;
+
+if (!model || model === '') {
+alert('⚠️ ERRO: Selecione um modelo de máquina!');
+return false;
+}
+if (!machineNumber || machineNumber === '') {
+alert('⚠️ ERRO: Digite o número da máquina!');
+document.getElementById('machineNumber').focus();
+return false;
+}
+if (!workDate || workDate === '') {
+alert('⚠️ ERRO: Selecione a data de trabalho!');
+return false;
+}
+
+const machineData = {
+model: model,
+number: machineNumber,
+date: workDate,
+timestamp: new Date().toLocaleString('pt-BR'),
+addedBy: currentUser,
+createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+positions: {
+right: getOperatorValue('opRight', 'customRight'),
+left: getOperatorValue('opLeft', 'customLeft'),
+backRight: getOperatorValue('opBackRight', 'customBackRight'),
+backLeft: getOperatorValue('opBackLeft', 'customBackLeft'),
+autoLubRight: getOperatorValue('opAutoLubRight', 'customAutoLubRight'),
+autoLubLeft: getOperatorValue('opAutoLubLeft', 'customAutoLubLeft')
+}
+};
+
+try {
+document.getElementById('btnAddMachine').disabled = true;
+document.getElementById('btnAddMachine').textContent = '⏳ Salvando...';
+
+await db.collection(COLLECTION_NAME).add(machineData);
+
+document.getElementById('machineModel').value = '';
+document.getElementById('machineNumber').value = '';
+
+['opRight', 'opLeft', 'opBackRight', 'opBackLeft', 'opAutoLubRight', 'opAutoLubLeft'].forEach(id => {
+document.getElementById(id).value = '';
+});
+['customRight', 'customLeft', 'customBackRight', 'customBackLeft', 'customAutoLubRight', 'customAutoLubLeft'].forEach(id => {
+const input = document.getElementById(id);
+input.value = '';
+input.classList.remove('show');
+});
+
+await loadData();
+updateStats();
+alert('✅ Máquina ' + model + ' Nº ' + machineNumber + ' salva com sucesso!');
+
+} catch (error) {
+console.error('❌ Erro:', error);
+alert('Erro ao salvar: ' + error.message);
+} finally {
+document.getElementById('btnAddMachine').disabled = false;
+document.getElementById('btnAddMachine').textContent = '✅ ADICIONAR MÁQUINA À LINHA';
+}
+return true;
+}
+
+async function loadData() {
+if (!firebaseInitialized) return;
+try {
+const snapshot = await db.collection(COLLECTION_NAME).orderBy('createdAt', 'desc').get();
+machinesData = [];
+snapshot.forEach(doc => {
+machinesData.push({ id: doc.id, ...doc.data() });
+});
+renderMachines();
+updateStats();
+} catch (error) {
+console.error('❌ Erro ao carregar:', error);
+}
+}
+
+function renderMachines() {
+const listContainer = document.getElementById('machinesList');
+const filterDate = document.getElementById('filterDate').value;
+
+listContainer.innerHTML = '';
+
+let filtered = machinesData.filter(m => m.date === filterDate);
+
+if (filtered.length === 0) {
+listContainer.innerHTML = '<div class="empty-state"><h3>📭 Nenhuma máquina registrada neste dia</h3><p>Adicione uma nova máquina para este dia.</p></div>';
+return;
+}
+
+filtered.forEach((machine, index) => {
+const dateParts = machine.date.split('-');
+const formattedDate = dateParts[2] + '/' + dateParts[1] + '/' + dateParts[0];
+
+const card = document.createElement('div');
+card.className = 'machine-card';
+card.innerHTML =
+'<div class="machine-header">' +
+'<div class="machine-info">' +
+'<span class="machine-model">' + machine.model + '</span>' +
+'<span class="machine-number">Nº ' + machine.number + '</span>' +
+'</div>' +
+'<div class="machine-date-badge">📅 ' + formattedDate + '</div>' +
+'</div>' +
+'<div class="machine-body">' +
+'<div class="section-title">👥 Posições Principais</div>' +
+'<div class="operator-grid">' +
+'<div class="operator-item pos-right"><div class="operator-label"><span class="badge badge-right">DIREITO</span></div><div class="operator-name">' + machine.positions.right + '</div></div>' +
+'<div class="operator-item pos-left"><div class="operator-label"><span class="badge badge-left">ESQUERDO</span></div><div class="operator-name">' + machine.positions.left + '</div></div>' +
+'<div class="operator-item pos-back-right"><div class="operator-label"><span class="badge badge-back">TRÁS DIR</span></div><div class="operator-name">' + machine.positions.backRight + '</div></div>' +
+'<div class="operator-item pos-back-left"><div class="operator-label"><span class="badge badge-back">TRÁS ESQ</span></div><div class="operator-name">' + machine.positions.backLeft + '</div></div>' +
+'</div>' +
+'<div class="section-title">🔧 Montar Auto Lub</div>' +
+'<div class="operator-grid">' +
+'<div class="operator-item pos-autolub-right"><div class="operator-label"><span class="badge badge-autolub">AUTO LUB DIR</span></div><div class="operator-name">' + machine.positions.autoLubRight + '</div></div>' +
+'<div class="operator-item pos-autolub-left"><div class="operator-label"><span class="badge badge-autolub">AUTO LUB ESQ</span></div><div class="operator-name">' + machine.positions.autoLubLeft + '</div></div>' +
+'</div>' +
+'</div>' +
+'<div class="actions"><button class="btn btn-delete" onclick="deleteMachine(\'' + machine.id + '\')">🗑️ Remover</button></div>';
+
+listContainer.appendChild(card);
+});
+}
+
+async function deleteMachine(id) {
+if (confirm('Deseja realmente remover esta máquina?')) {
+try {
+await db.collection(COLLECTION_NAME).doc(id).delete();
+await loadData();
+updateStats();
+} catch (error) {
+alert('Erro ao remover: ' + error.message);
+}
+}
+}
+
+function updateStats() {
+const total = machinesData.length;
+const today = document.getElementById('filterDate').value;
+const todayCount = machinesData.filter(m => m.date === today).length;
+
+document.getElementById('totalMachines').innerText = total;
+document.getElementById('todayMachines').innerText = todayCount;
+document.getElementById('storageStatus').innerText = firebaseInitialized ? 'OK' : 'ERRO';
+document.getElementById('storageStatus').style.color = firebaseInitialized ? '#27ae60' : '#e74c3c';
+}
+</script>
+</body>
+</html>
