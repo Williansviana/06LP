@@ -9,6 +9,7 @@
 --primary-color: #2c3e50;
 --accent-color: #3498db;
 --success-color: #27ae60;
+--warning-color: #f39c12;
 --bg-color: #f4f7f6;
 --card-bg: #ffffff;
 --border-color: #ddd;
@@ -248,6 +249,13 @@ padding: 15px;
 transform: translateY(-2px);
 box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
+.btn-reset-small {
+background-color: var(--warning-color);
+color: white;
+padding: 5px 10px;
+font-size: 0.75rem;
+margin-left: 10px;
+}
 .btn-delete {
 background-color: #e74c3c;
 color: white;
@@ -392,6 +400,12 @@ gap: 15px;
 box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 .stat-item { text-align: center; }
+.stat-item-with-btn {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+}
 .stat-number {
 font-size: 1.5rem;
 font-weight: bold;
@@ -416,6 +430,81 @@ box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.2) !important;
 }
 .custom-operator { display: none; margin-top: 10px; }
 .custom-operator.show { display: block; }
+/* Modal de Senha Admin - CORRIGIDO */
+.modal-overlay {
+display: none;
+position: fixed;
+top: 0; left: 0;
+width: 100%; height: 100%;
+background-color: rgba(0, 0, 0, 0.7);
+z-index: 3000;
+justify-content: center;
+align-items: center;
+}
+.modal-overlay.active {
+display: flex !important;
+}
+.modal-content {
+background-color: white;
+padding: 30px;
+border-radius: 10px;
+box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+max-width: 400px;
+width: 90%;
+text-align: center;
+animation: modalSlideIn 0.3s ease;
+}
+@keyframes modalSlideIn {
+from {
+opacity: 0;
+transform: translateY(-50px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+.modal-title {
+font-size: 1.3rem;
+color: var(--primary-color);
+margin-bottom: 20px;
+font-weight: bold;
+}
+.modal-input {
+width: 100%;
+padding: 12px;
+border: 2px solid var(--border-color);
+border-radius: 5px;
+font-size: 1rem;
+margin-bottom: 15px;
+text-align: center;
+}
+.modal-input:focus {
+outline: none;
+border-color: var(--accent-color);
+}
+.modal-buttons {
+display: flex;
+gap: 10px;
+justify-content: center;
+}
+.modal-btn {
+padding: 10px 20px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-weight: bold;
+font-size: 0.95rem;
+}
+.modal-btn-confirm { background-color: #c0392b; color: white; }
+.modal-btn-cancel { background-color: #95a5a6; color: white; }
+.modal-error {
+color: #e74c3c;
+font-size: 0.9rem;
+margin-top: 10px;
+display: none;
+}
+.lock-icon { font-size: 2rem; margin-bottom: 15px; }
 .firebase-status {
 position: fixed;
 bottom: 20px; right: 20px;
@@ -449,6 +538,13 @@ height: 60px;
 .date-filter-panel { flex-direction: column; align-items: stretch; }
 .header-actions { position: static; margin-top: 15px; justify-content: center; }
 .save-status { position: static; margin-top: 10px; justify-content: center; }
+.stat-item-with-btn {
+flex-direction: column;
+gap: 5px;
+}
+.btn-reset-small {
+margin-left: 0;
+}
 }
 </style>
 </head>
@@ -477,7 +573,7 @@ height: 60px;
 <!-- CENTRO - TÍTULO -->
 <div class="header-center">
 <h1>🏭 Linha 06 LP</h1>
-<p>Controle de Produção MWL</p>
+<p>Controle de Produção - Firebase Cloud</p>
 </div>
 
 <!-- LADO DIREITO - AÇÕES -->
@@ -494,11 +590,14 @@ height: 60px;
 </header>
 
 <div class="container">
-<!-- Barra de Estatísticas (SEM TURNO) -->
+<!-- Barra de Estatísticas -->
 <div class="stats-bar">
-<div class="stat-item">
+<div class="stat-item stat-item-with-btn">
+<div>
 <div class="stat-number" id="totalMachines">0</div>
 <div class="stat-label">Total de Máquinas Feitas</div>
+</div>
+<button class="btn btn-reset-small" onclick="showResetModal()" id="btnResetTotal" title="Zerar Total">🔄 Zerar</button>
 </div>
 <div class="stat-item">
 <div class="stat-number" id="todayMachines">0</div>
@@ -510,7 +609,7 @@ height: 60px;
 </div>
 </div>
 
-<!-- Filtro de Data (SEM FILTRO DE TURNO) -->
+<!-- Filtro de Data -->
 <div class="date-filter-panel">
 <div class="filter-group">
 <label for="filterDate">📅 Visualizar Dia:</label>
@@ -521,7 +620,7 @@ height: 60px;
 </div>
 </div>
 
-<!-- Formulário de Entrada (SEM TURNO) -->
+<!-- Formulário de Entrada -->
 <div class="input-panel">
 <div class="form-section">
 <h3>📅 Data do Trabalho</h3>
@@ -654,6 +753,21 @@ height: 60px;
 
 <!-- Lista de Máquinas -->
 <div id="machinesList" class="machines-container"></div>
+</div>
+
+<!-- Modal de Senha Admin para Zerar - CORRIGIDO -->
+<div class="modal-overlay" id="resetModal">
+<div class="modal-content">
+<div class="lock-icon">🔄</div>
+<div class="modal-title">Zerar Total de Máquinas</div>
+<p style="color: #7f8c8d; margin-bottom: 15px; font-size: 0.9rem;">Digite a senha de administrador para zerar o contador</p>
+<input type="password" id="resetPassword" class="modal-input" placeholder="Senha" onkeypress="handleResetKeyPress(event)">
+<div class="modal-error" id="resetError">Senha incorreta!</div>
+<div class="modal-buttons">
+<button class="modal-btn modal-btn-cancel" onclick="closeResetModal()">Cancelar</button>
+<button class="modal-btn modal-btn-confirm" onclick="verifyResetPassword()">Confirmar</button>
+</div>
+</div>
 </div>
 
 <!-- Status Firebase -->
@@ -808,6 +922,131 @@ return customInput.value.trim();
 return select.value;
 }
 return 'Não atribuído';
+}
+
+// ============================================
+// MODAL PARA ZERAR TOTAL - CORRIGIDO
+// ============================================
+function showResetModal() {
+console.log('🔍 showResetModal chamado');
+console.log('currentUser:', currentUser);
+
+if (currentUser !== 'admin') {
+alert('⚠️ Apenas administradores podem zerar o total!\n\nFaça login como admin para continuar.\n\nUsuário: admin\nSenha: admin2024');
+return;
+}
+
+const modal = document.getElementById('resetModal');
+console.log('Modal elemento:', modal);
+
+if (!modal) {
+alert('❌ Erro: Modal não encontrado no HTML!');
+return;
+}
+
+// ✅ CORREÇÃO: Usar classList.add E style.display
+modal.classList.add('active');
+modal.style.display = 'flex';
+
+console.log('✅ Modal ativado');
+console.log('Modal classes:', modal.classList);
+console.log('Modal display:', window.getComputedStyle(modal).display);
+
+document.getElementById('resetPassword').value = '';
+document.getElementById('resetError').style.display = 'none';
+setTimeout(() => {
+document.getElementById('resetPassword').focus();
+}, 100);
+}
+
+function closeResetModal() {
+const modal = document.getElementById('resetModal');
+modal.classList.remove('active');
+modal.style.display = 'none';
+document.getElementById('resetPassword').value = '';
+document.getElementById('resetError').style.display = 'none';
+}
+
+function handleResetKeyPress(event) {
+if (event.key === 'Enter') {
+verifyResetPassword();
+}
+}
+
+function verifyResetPassword() {
+const enteredPass = document.getElementById('resetPassword').value;
+const adminPass = atob(USERS['admin']);
+
+console.log('Senha digitada:', enteredPass);
+console.log('Senha esperada:', adminPass);
+
+if (enteredPass === adminPass) {
+closeResetModal();
+resetTotalMachines();
+} else {
+document.getElementById('resetError').style.display = 'block';
+document.getElementById('resetPassword').value = '';
+document.getElementById('resetPassword').focus();
+}
+}
+
+// ============================================
+// ZERAR TOTAL DE MÁQUINAS
+// ============================================
+async function resetTotalMachines() {
+if (!firebaseInitialized) {
+alert('❌ Firebase não conectado!');
+return;
+}
+
+const confirmacao = confirm(
+'⚠️ ATENÇÃO:\n\n' +
+'Isso apagará TODAS as máquinas registradas.\n\n' +
+'O total voltará para ZERO.\n\n' +
+'Tem certeza que deseja continuar?'
+);
+
+if (!confirmacao) {
+return;
+}
+
+try {
+document.getElementById('btnResetTotal').disabled = true;
+document.getElementById('btnResetTotal').textContent = '⏳...';
+
+const snapshot = await db.collection(COLLECTION_NAME).get();
+
+if (snapshot.empty) {
+alert('ℹ️ Não há dados para zerar.');
+document.getElementById('btnResetTotal').disabled = false;
+document.getElementById('btnResetTotal').textContent = '🔄 Zerar';
+return;
+}
+
+console.log('🗑️ Excluindo', snapshot.size, 'máquinas...');
+
+const batch = db.batch();
+snapshot.forEach(doc => {
+batch.delete(doc.ref);
+});
+
+await batch.commit();
+
+console.log('✅ Total zerado com sucesso!');
+
+machinesData = [];
+renderMachines();
+updateStats();
+
+alert('✅ Total de máquinas zerado com sucesso!');
+
+} catch (error) {
+console.error('❌ Erro ao zerar:', error);
+alert('❌ Erro ao zerar total:\n\n' + error.message);
+} finally {
+document.getElementById('btnResetTotal').disabled = false;
+document.getElementById('btnResetTotal').textContent = '🔄 Zerar';
+}
 }
 
 // ============================================
