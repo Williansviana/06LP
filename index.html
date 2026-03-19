@@ -1,1209 +1,970 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Controle Linha 06 LP</title>
-<style>
-:root {
---primary-color: #2c3e50;
---accent-color: #3498db;
---success-color: #27ae60;
---warning-color: #f39c12;
---bg-color: #f4f7f6;
---card-bg: #ffffff;
---border-color: #ddd;
---header-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-background-color: var(--bg-color);
-padding: 20px;
-color: #333;
-}
-/* ===== TELA DE LOGIN ===== */
-#loginScreen {
-position: fixed;
-top: 0; left: 0;
-width: 100%; height: 100%;
-background: var(--header-bg);
-display: flex;
-justify-content: center;
-align-items: center;
-z-index: 2000;
-padding: 20px;
-}
-#loginScreen.hidden { display: none; }
-.login-card {
-background: white;
-padding: 40px;
-border-radius: 15px;
-box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-max-width: 400px;
-width: 100%;
-text-align: center;
-}
-.login-logo { font-size: 3rem; margin-bottom: 20px; }
-.login-title { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 10px; font-weight: bold; }
-.login-subtitle { color: #7f8c8d; margin-bottom: 30px; font-size: 0.95rem; }
-.login-input {
-width: 100%;
-padding: 15px;
-border: 2px solid var(--border-color);
-border-radius: 8px;
-font-size: 1rem;
-margin-bottom: 15px;
-transition: border-color 0.3s;
-}
-.login-input:focus {
-outline: none;
-border-color: var(--accent-color);
-box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
-.login-btn {
-width: 100%;
-padding: 15px;
-background: var(--header-bg);
-color: white;
-border: none;
-border-radius: 8px;
-font-size: 1rem;
-font-weight: bold;
-cursor: pointer;
-transition: transform 0.2s, box-shadow 0.2s;
-}
-.login-btn:hover {
-transform: translateY(-2px);
-box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-}
-.login-error {
-color: #e74c3c;
-font-size: 0.9rem;
-margin-top: 15px;
-display: none;
-}
-.login-error.show { display: block; }
-/* ===== APP PRINCIPAL ===== */
-#appScreen { display: none; }
-#appScreen.visible { display: block; }
-header {
-text-align: center;
-margin-bottom: 30px;
-background: var(--header-bg);
-color: white;
-padding: 25px;
-border-radius: 10px;
-box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-position: relative;
-display: flex;
-align-items: center;
-justify-content: space-between;
-gap: 20px;
-}
-.header-left {
-display: flex;
-align-items: center;
-gap: 15px;
-}
-.header-logo {
-width: 80px;
-height: 80px;
-object-fit: contain;
-border-radius: 10px;
-background-color: rgba(255,255,255,0.15);
-padding: 8px;
-border: 2px solid rgba(255,255,255,0.3);
-}
-.header-center {
-flex: 1;
-text-align: center;
-}
-.header-center h1 { margin: 0; font-size: 2rem; }
-.header-center p { margin: 10px 0 0; opacity: 0.9; }
-.header-actions {
-display: flex;
-align-items: center;
-gap: 15px;
-}
-.user-info {
-font-size: 0.9rem;
-background-color: rgba(255,255,255,0.2);
-padding: 5px 12px;
-border-radius: 20px;
-}
-.btn-logout {
-background-color: rgba(255,255,255,0.3);
-color: white;
-border: none;
-padding: 8px 15px;
-border-radius: 20px;
-cursor: pointer;
-font-size: 0.85rem;
-transition: background-color 0.3s;
-}
-.btn-logout:hover { background-color: rgba(255,255,255,0.5); }
-.save-status {
-position: absolute;
-bottom: 10px;
-right: 20px;
-background-color: rgba(255,255,255,0.3);
-padding: 5px 12px;
-border-radius: 20px;
-font-size: 0.8rem;
-display: flex;
-align-items: center;
-gap: 5px;
-}
-.save-dot {
-width: 10px; height: 10px;
-background-color: #2ecc71;
-border-radius: 50%;
-animation: pulse 2s infinite;
-}
-@keyframes pulse {
-0% { opacity: 1; transform: scale(1); }
-50% { opacity: 0.5; transform: scale(0.8); }
-100% { opacity: 1; transform: scale(1); }
-}
-.container { max-width: 1400px; margin: 0 auto; }
-.input-panel {
-background-color: var(--card-bg);
-padding: 25px;
-border-radius: 10px;
-box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-margin-bottom: 30px;
-}
-.form-section {
-margin-bottom: 25px;
-padding-bottom: 20px;
-border-bottom: 2px solid #ecf0f1;
-}
-.form-section:last-child {
-border-bottom: none;
-margin-bottom: 0;
-padding-bottom: 0;
-}
-.form-section h3 {
-color: var(--primary-color);
-margin-top: 0;
-margin-bottom: 15px;
-font-size: 1.2rem;
-}
-.form-grid {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-gap: 15px;
-}
-.form-group { display: flex; flex-direction: column; }
-label {
-font-size: 0.9rem;
-font-weight: 600;
-margin-bottom: 5px;
-color: var(--primary-color);
-}
-input, select {
-padding: 12px;
-border: 2px solid var(--border-color);
-border-radius: 5px;
-font-size: 0.95rem;
-transition: border-color 0.3s;
-width: 100%;
-cursor: pointer;
-}
-input:focus, select:focus {
-outline: none;
-border-color: var(--accent-color);
-box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
-input[type="date"] {
-font-family: inherit;
-color: var(--primary-color);
-font-weight: bold;
-cursor: pointer;
-}
-input[type="password"] {
-cursor: text;
-letter-spacing: 2px;
-}
-select { background-color: #fff; }
-select option { padding: 10px; }
-.btn {
-padding: 12px 25px;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-font-weight: bold;
-font-size: 1rem;
-transition: all 0.3s;
-}
-.btn-add {
-background: var(--header-bg);
-color: white;
-width: 100%;
-margin-top: 10px;
-font-size: 1.1rem;
-padding: 15px;
-}
-.btn-add:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-.btn-reset-small {
-background-color: var(--warning-color);
-color: white;
-padding: 5px 10px;
-font-size: 0.75rem;
-margin-left: 10px;
-}
-.btn-delete {
-background-color: #e74c3c;
-color: white;
-padding: 6px 12px;
-font-size: 0.85rem;
-}
-.btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
-.date-filter-panel {
-background-color: #e8f4fd;
-padding: 15px 20px;
-border-radius: 8px;
-margin-bottom: 20px;
-display: flex;
-align-items: center;
-justify-content: space-between;
-flex-wrap: wrap;
-gap: 15px;
-border: 1px solid #b6e4fe;
-}
-.filter-group {
-display: flex;
-align-items: center;
-gap: 10px;
-}
-.filter-group label {
-margin: 0;
-font-weight: bold;
-color: #2980b9;
-font-size: 1rem;
-}
-.machines-container {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
-gap: 20px;
-}
-.machine-card {
-background-color: var(--card-bg);
-border-radius: 10px;
-overflow: hidden;
-box-shadow: 0 3px 10px rgba(0,0,0,0.12);
-border-top: 5px solid var(--accent-color);
-transition: all 0.3s ease;
-}
-.machine-card:hover {
-transform: translateY(-3px);
-box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-.machine-header {
-background: var(--header-bg);
-color: white;
-padding: 15px 20px;
-display: flex;
-justify-content: space-between;
-align-items: center;
-flex-wrap: wrap;
-gap: 10px;
-}
-.machine-info {
-display: flex;
-flex-direction: column;
-gap: 5px;
-}
-.machine-model { font-weight: bold; font-size: 1.3rem; }
-.machine-number {
-font-size: 0.9rem;
-background-color: rgba(255,255,255,0.3);
-padding: 2px 8px;
-border-radius: 4px;
-display: inline-block;
-font-weight: 500;
-}
-.machine-date-badge {
-background-color: rgba(255,255,255,0.2);
-padding: 4px 10px;
-border-radius: 15px;
-font-size: 0.85rem;
-}
-.machine-body { padding: 20px; }
-.section-title {
-font-size: 0.9rem;
-font-weight: bold;
-color: var(--primary-color);
-margin: 15px 0 10px;
-padding-bottom: 5px;
-border-bottom: 2px solid #ecf0f1;
-}
-.operator-grid {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 12px;
-}
-.operator-item {
-background-color: #f8f9fa;
-padding: 12px;
-border-radius: 5px;
-border-left: 4px solid var(--accent-color);
-}
-.operator-label { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 5px; }
-.operator-name { font-weight: 600; color: #2c3e50; font-size: 0.95rem; word-break: break-word; }
-.actions {
-padding: 15px 20px;
-background-color: #f8f9fa;
-text-align: right;
-border-top: 1px solid #ecf0f1;
-}
-.pos-right { border-left-color: #e74c3c !important; }
-.pos-left { border-left-color: #9b59b6 !important; }
-.pos-back-right { border-left-color: #f39c12 !important; }
-.pos-back-left { border-left-color: #1abc9c !important; }
-.pos-autolub-right { border-left-color: #3498db !important; }
-.pos-autolub-left { border-left-color: #2ecc71 !important; }
-.badge {
-display: inline-block;
-padding: 3px 8px;
-border-radius: 3px;
-font-size: 0.7rem;
-font-weight: bold;
-}
-.badge-right { background-color: #ffebee; color: #c62828; }
-.badge-left { background-color: #f3e5f5; color: #7b1fa2; }
-.badge-back { background-color: #fff3e0; color: #ef6c00; }
-.badge-autolub { background-color: #e3f2fd; color: #1565c0; }
-.empty-state {
-grid-column: 1 / -1;
-text-align: center;
-padding: 60px 20px;
-color: #7f8c8d;
-background-color: #fff;
-border-radius: 10px;
-border: 2px dashed #bdc3c7;
-}
-.stats-bar {
-background-color: #fff;
-padding: 15px 20px;
-border-radius: 8px;
-margin-bottom: 20px;
-display: flex;
-justify-content: space-around;
-flex-wrap: wrap;
-gap: 15px;
-box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-.stat-item { text-align: center; }
-.stat-item-with-btn {
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 10px;
-}
-.stat-number {
-font-size: 1.5rem;
-font-weight: bold;
-color: var(--accent-color);
-}
-.stat-label { font-size: 0.85rem; color: #7f8c8d; }
-.machine-number-input {
-background-color: #fff3cd;
-border-color: #ffc107 !important;
-}
-.machine-number-input:focus {
-border-color: #ff9800 !important;
-box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2) !important;
-}
-.operator-select {
-background-color: #e8f8f5;
-border-color: #1abc9c !important;
-}
-.operator-select:focus {
-border-color: #16a085 !important;
-box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.2) !important;
-}
-.custom-operator { display: none; margin-top: 10px; }
-.custom-operator.show { display: block; }
-/* Modal de Senha Admin - CORRIGIDO */
-.modal-overlay {
-display: none;
-position: fixed;
-top: 0; left: 0;
-width: 100%; height: 100%;
-background-color: rgba(0, 0, 0, 0.7);
-z-index: 3000;
-justify-content: center;
-align-items: center;
-}
-.modal-overlay.active {
-display: flex !important;
-}
-.modal-content {
-background-color: white;
-padding: 30px;
-border-radius: 10px;
-box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-max-width: 400px;
-width: 90%;
-text-align: center;
-animation: modalSlideIn 0.3s ease;
-}
-@keyframes modalSlideIn {
-from {
-opacity: 0;
-transform: translateY(-50px);
-}
-to {
-opacity: 1;
-transform: translateY(0);
-}
-}
-.modal-title {
-font-size: 1.3rem;
-color: var(--primary-color);
-margin-bottom: 20px;
-font-weight: bold;
-}
-.modal-input {
-width: 100%;
-padding: 12px;
-border: 2px solid var(--border-color);
-border-radius: 5px;
-font-size: 1rem;
-margin-bottom: 15px;
-text-align: center;
-}
-.modal-input:focus {
-outline: none;
-border-color: var(--accent-color);
-}
-.modal-buttons {
-display: flex;
-gap: 10px;
-justify-content: center;
-}
-.modal-btn {
-padding: 10px 20px;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-font-weight: bold;
-font-size: 0.95rem;
-}
-.modal-btn-confirm { background-color: #c0392b; color: white; }
-.modal-btn-cancel { background-color: #95a5a6; color: white; }
-.modal-error {
-color: #e74c3c;
-font-size: 0.9rem;
-margin-top: 10px;
-display: none;
-}
-.lock-icon { font-size: 2rem; margin-bottom: 15px; }
-.firebase-status {
-position: fixed;
-bottom: 20px; right: 20px;
-background-color: white;
-padding: 10px 20px;
-border-radius: 8px;
-box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-display: flex;
-align-items: center;
-gap: 8px;
-font-size: 0.9rem;
-z-index: 100;
-}
-.firebase-status.connected { border-left: 4px solid #27ae60; }
-.firebase-status.error { border-left: 4px solid #e74c3c; }
-@media (max-width: 768px) {
-header {
-flex-direction: column;
-gap: 15px;
-}
-.header-left, .header-center, .header-actions {
-width: 100%;
-justify-content: center;
-}
-.header-logo {
-width: 60px;
-height: 60px;
-}
-.machines-container { grid-template-columns: 1fr; }
-.operator-grid { grid-template-columns: 1fr; }
-.date-filter-panel { flex-direction: column; align-items: stretch; }
-.header-actions { position: static; margin-top: 15px; justify-content: center; }
-.save-status { position: static; margin-top: 10px; justify-content: center; }
-.stat-item-with-btn {
-flex-direction: column;
-gap: 5px;
-}
-.btn-reset-small {
-margin-left: 0;
-}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Linha 06 LP 🏭</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --purple-color: #9b59b6;
+            --teal-color: #1abc9c;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --border-color: #ddd;
+            --header-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow-sm: 0 2px 10px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-color);
+            padding: 20px;
+            color: #333;
+            line-height: 1.5;
+        }
+        /* ===== TELA DE LOGIN ===== */
+        #loginScreen {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--header-bg);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000; padding: 20px;
+        }
+        #loginScreen.hidden { display: none; }
+        .login-card {
+            background: white; padding: 40px; border-radius: 15px;
+            box-shadow: var(--shadow-lg); max-width: 400px; width: 100%;
+            text-align: center; animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .login-logo { font-size: 3rem; margin-bottom: 20px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .login-title { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 10px; font-weight: bold; }
+        .login-subtitle { color: #7f8c8d; margin-bottom: 30px; font-size: 0.95rem; }
+        .login-input {
+            width: 100%; padding: 15px; border: 2px solid var(--border-color);
+            border-radius: 8px; font-size: 1rem; margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        .login-input:focus {
+            outline: none; border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+        }
+        .login-btn {
+            width: 100%; padding: 15px; background: var(--header-bg);
+            color: white; border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: bold; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px); box-shadow: var(--shadow-md);
+            background: linear-gradient(135deg, #5a6fd6 0%, #6a3fc9 100%);
+        }
+        .login-btn:active { transform: translateY(0); }
+        .login-error {
+            color: var(--danger-color); font-size: 0.9rem;
+            margin-top: 15px; display: none; font-weight: 500;
+        }
+        .login-error.show { display: block; animation: shake 0.5s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        
+        /* ===== APP PRINCIPAL ===== */
+        #appScreen { display: none; }
+        #appScreen.visible { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        header {
+            text-align: center; margin-bottom: 30px;
+            background: var(--header-bg); color: white;
+            padding: 25px; border-radius: 10px;
+            box-shadow: var(--shadow-sm); position: relative;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 20px; flex-wrap: wrap;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .header-logo {
+            width: 80px; height: 80px; object-fit: contain;
+            border-radius: 10px; background-color: rgba(255,255,255,0.15);
+            padding: 8px; border: 2px solid rgba(255,255,255,0.3);
+            transition: transform 0.3s;
+        }
+        .header-logo:hover { transform: scale(1.05); }
+        .header-center { flex: 1; text-align: center; min-width: 200px; }
+        .header-center h1 { margin: 0; font-size: 2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header-center p { margin: 10px 0 0; opacity: 0.95; font-size: 0.95rem; }
+        .header-actions { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .user-info { 
+            font-size: 0.9rem; background-color: rgba(255,255,255,0.2); 
+            padding: 5px 12px; border-radius: 20px; font-weight: 500;
+        }
+        .btn-logout { 
+            background-color: rgba(255,255,255,0.3); color: white; 
+            border: none; padding: 8px 15px; border-radius: 20px; 
+            cursor: pointer; font-size: 0.85rem; transition: all 0.3s; 
+            font-weight: 500;
+        }
+        .btn-logout:hover { background-color: rgba(255,255,255,0.5); transform: translateY(-1px); }
+        
+        .save-status { 
+            position: absolute; bottom: 10px; right: 20px; 
+            background-color: rgba(255,255,255,0.25); 
+            padding: 5px 12px; border-radius: 20px; 
+            font-size: 0.8rem; display: flex; align-items: center; gap: 5px;
+            backdrop-filter: blur(4px);
+        }
+        .save-dot { 
+            width: 10px; height: 10px; background-color: #2ecc71; 
+            border-radius: 50%; animation: pulse 2s infinite; 
+            box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
+        }
+        @keyframes pulse { 
+            0% { transform: scale(1); opacity: 1; } 
+            50% { transform: scale(0.8); opacity: 0.6; box-shadow: 0 0 0 8px rgba(46, 204, 113, 0); } 
+            100% { transform: scale(1); opacity: 1; } 
+        }
+        
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        .input-panel { 
+            background-color: var(--card-bg); padding: 25px; 
+            border-radius: 10px; box-shadow: var(--shadow-sm); 
+            margin-bottom: 30px; border-left: 4px solid var(--accent-color);
+        }
+        .form-section { 
+            margin-bottom: 25px; padding-bottom: 20px; 
+            border-bottom: 2px solid #ecf0f1; 
+        }
+        .form-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .form-section h3 { 
+            color: var(--primary-color); margin-top: 0; margin-bottom: 15px; 
+            font-size: 1.2rem; display: flex; align-items: center; gap: 8px;
+        }
+        .form-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 15px; 
+        }
+        .form-group { display: flex; flex-direction: column; }
+        label { 
+            font-size: 0.9rem; font-weight: 600; margin-bottom: 5px; 
+            color: var(--primary-color); display: flex; align-items: center; gap: 5px;
+        }
+        input, select { 
+            padding: 12px; border: 2px solid var(--border-color); 
+            border-radius: 5px; font-size: 0.95rem; transition: all 0.3s; 
+            width: 100%; cursor: pointer; background: white;
+        }
+        input:focus, select:focus { 
+            outline: none; border-color: var(--accent-color); 
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15); 
+            cursor: text;
+        }
+        input:disabled, select:disabled { 
+            background-color: #f5f5f5; cursor: not-allowed; opacity: 0.7; 
+        }
+        
+        .btn { 
+            padding: 12px 25px; border: none; border-radius: 5px; 
+            cursor: pointer; font-weight: bold; font-size: 1rem; 
+            transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-add { 
+            background: var(--header-bg); color: white; width: 100%; 
+            margin-top: 10px; font-size: 1.1rem; padding: 15px; 
+            justify-content: center;
+        }
+        .btn-add:hover { 
+            transform: translateY(-2px); box-shadow: var(--shadow-md); 
+            background: linear-gradient(135deg, #5a6fd6 0%, #6a3fc9 100%);
+        }
+        .btn-add:active { transform: translateY(0); }
+        .btn-reset-small { 
+            background-color: var(--warning-color); color: white; 
+            padding: 5px 10px; font-size: 0.75rem; margin-left: 10px; 
+            border-radius: 4px; font-weight: 500;
+        }
+        .btn-reset-small:hover { background-color: #e67e22; transform: translateY(-1px); }
+        .btn-delete { 
+            background-color: var(--danger-color); color: white; 
+            padding: 6px 12px; font-size: 0.85rem; border-radius: 4px;
+            font-weight: 500;
+        }
+        .btn-delete:hover { background-color: #c0392b; transform: translateY(-1px); }
+        
+        .date-filter-panel { 
+            background: linear-gradient(135deg, #e8f4fd 0%, #d4e9f7 100%); 
+            padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; 
+            display: flex; align-items: center; justify-content: space-between; 
+            flex-wrap: wrap; gap: 15px; border: 1px solid #b6e4fe;
+        }
+        .filter-group { display: flex; align-items: center; gap: 10px; }
+        .filter-group label { margin: 0; font-weight: bold; color: #2980b9; font-size: 1rem; }
+        
+        .machines-container { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(550px, 1fr)); 
+            gap: 20px; 
+        }
+        .machine-card { 
+            background-color: var(--card-bg); border-radius: 10px; 
+            overflow: hidden; box-shadow: var(--shadow-sm); 
+            border-top: 5px solid var(--accent-color); 
+            transition: all 0.3s ease; position: relative;
+        }
+        .machine-card:hover { 
+            transform: translateY(-3px); box-shadow: var(--shadow-lg); 
+        }
+        .machine-card::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        
+        .machine-header { 
+            background: var(--header-bg); color: white; padding: 15px 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            flex-wrap: wrap; gap: 10px;
+        }
+        .machine-info { display: flex; flex-direction: column; gap: 5px; }
+        .machine-model { font-weight: bold; font-size: 1.3rem; }
+        .machine-number { 
+            font-size: 0.9rem; background-color: rgba(255,255,255,0.3); 
+            padding: 2px 8px; border-radius: 4px; display: inline-block; 
+            font-weight: 500;
+        }
+        .machine-date-badge { 
+            background-color: rgba(255,255,255,0.2); padding: 4px 10px; 
+            border-radius: 15px; font-size: 0.85rem; font-weight: 500;
+        }
+        .machine-body { padding: 20px; }
+        .section-title { 
+            font-size: 0.9rem; font-weight: bold; color: var(--primary-color); 
+            margin: 15px 0 10px; padding-bottom: 5px; 
+            border-bottom: 2px solid #ecf0f1; display: flex; align-items: center; gap: 6px;
+        }
+        .operator-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+            gap: 12px; 
+        }
+        .operator-item { 
+            background-color: #f8f9fa; padding: 12px; border-radius: 5px; 
+            border-left: 4px solid var(--accent-color); transition: all 0.2s;
+        }
+        .operator-item:hover { background-color: #f1f3f5; transform: translateX(3px); }
+        .operator-label { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 5px; font-weight: 500; }
+        .operator-name { font-weight: 600; color: #2c3e50; font-size: 0.95rem; word-break: break-word; }
+        .actions { 
+            padding: 15px 20px; background-color: #f8f9fa; text-align: right; 
+            border-top: 1px solid #ecf0f1;
+        }
+        
+        /* Cores das posições */
+        .pos-right { border-left-color: #e74c3c !important; }   /* 🔴 Direito */
+        .pos-left { border-left-color: #9b59b6 !important; }    /* 🟣 Esquerdo */
+        .pos-back-right { border-left-color: #f39c12 !important; }  /* 🟠 Trás Direito */
+        .pos-back-left { border-left-color: #1abc9c !important; }   /* 🟦 Trás Esquerdo */
+        .pos-autolub-right { border-left-color: #3498db !important; } /* 🔵 Auto Lub Direito */
+        .pos-autolub-left { border-left-color: #27ae60 !important; }  /* 🟢 Auto Lub Esquerdo */
+        
+        .badge { 
+            display: inline-block; padding: 3px 8px; border-radius: 3px; 
+            font-size: 0.7rem; font-weight: bold; margin-left: 5px;
+        }
+        .badge-right { background-color: #ffebee; color: #c62828; }
+        .badge-left { background-color: #f3e5f5; color: #7b1fa2; }
+        .badge-back { background-color: #fff3e0; color: #ef6c00; }
+        .badge-autolub { background-color: #e3f2fd; color: #1565c0; }
+        
+        .empty-state { 
+            grid-column: 1 / -1; text-align: center; padding: 60px 20px; 
+            color: #7f8c8d; background-color: #fff; border-radius: 10px; 
+            border: 2px dashed #bdc3c7; animation: fadeIn 0.5s;
+        }
+        .empty-state h3 { margin-bottom: 10px; font-size: 1.3rem; }
+        
+        .stats-bar { 
+            background-color: #fff; padding: 15px 20px; border-radius: 8px; 
+            margin-bottom: 20px; display: flex; justify-content: center; 
+            flex-wrap: wrap; gap: 20px; box-shadow: var(--shadow-sm);
+        }
+        .stat-item { text-align: center; min-width: 140px; }
+        .stat-number { font-size: 1.5rem; font-weight: bold; color: var(--accent-color); }
+        .stat-label { font-size: 0.85rem; color: #7f8c8d; font-weight: 500; }
+        
+        .custom-operator { display: none; margin-top: 10px; animation: slideDown 0.3s ease; }
+        .custom-operator.show { display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Modal Admin */
+        .modal-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background-color: rgba(0, 0, 0, 0.7); z-index: 3000; 
+            justify-content: center; align-items: center; 
+            animation: fadeIn 0.3s;
+        }
+        .modal-overlay.active { display: flex !important; }
+        .modal-content { 
+            background-color: white; padding: 30px; border-radius: 10px; 
+            box-shadow: var(--shadow-lg); max-width: 400px; width: 90%; 
+            text-align: center; animation: slideUp 0.3s ease;
+        }
+        .modal-title { font-size: 1.3rem; color: var(--primary-color); margin-bottom: 20px; font-weight: bold; }
+        .modal-input { 
+            width: 100%; padding: 12px; border: 2px solid var(--border-color); 
+            border-radius: 5px; font-size: 1rem; margin-bottom: 15px; text-align: center;
+        }
+        .modal-input:focus { outline: none; border-color: var(--accent-color); }
+        .modal-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+        .modal-btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .modal-btn-confirm { background-color: #c0392b; color: white; }
+        .modal-btn-confirm:hover { background-color: #a93226; transform: translateY(-1px); }
+        .modal-btn-cancel { background-color: #95a5a6; color: white; }
+        .modal-btn-cancel:hover { background-color: #7f8c8d; transform: translateY(-1px); }
+        .modal-error { color: var(--danger-color); font-size: 0.9rem; margin-top: 10px; display: none; font-weight: 500; }
+        
+        .firebase-status { 
+            position: fixed; bottom: 20px; right: 20px; background-color: white; 
+            padding: 10px 20px; border-radius: 8px; box-shadow: var(--shadow-md); 
+            display: flex; align-items: center; gap: 8px; font-size: 0.9rem; z-index: 100;
+            font-weight: 500;
+        }
+        .firebase-status.connected { border-left: 4px solid #27ae60; }
+        .firebase-status.error { border-left: 4px solid #e74c3c; }
+        .firebase-status.connecting { border-left: 4px solid #f39c12; }
+        
+        /* Toast de notificação */
+        .toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #2c3e50; color: white; padding: 12px 24px; border-radius: 8px;
+            box-shadow: var(--shadow-lg); z-index: 4000; font-weight: 500;
+            display: flex; align-items: center; gap: 8px; animation: slideUpToast 0.3s ease;
+        }
+        .toast.success { background: var(--success-color); }
+        .toast.error { background: var(--danger-color); }
+        .toast.warning { background: var(--warning-color); }
+        @keyframes slideUpToast { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+        
+        /* Responsivo */
+        @media (max-width: 768px) {
+            header { flex-direction: column; text-align: center; }
+            .header-actions { justify-content: center; }
+            .machines-container { grid-template-columns: 1fr; }
+            .operator-grid { grid-template-columns: 1fr; }
+            .stats-bar { flex-direction: column; align-items: center; }
+            .date-filter-panel { flex-direction: column; align-items: flex-start; }
+            .filter-group { width: 100%; justify-content: space-between; }
+        }
+        
+        /* Acessibilidade */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+        }
+        a:focus, button:focus, input:focus, select:focus {
+            outline: 2px solid var(--accent-color); outline-offset: 2px;
+        }
+    </style>
 </head>
 <body>
-<!-- ===== TELA DE LOGIN ===== -->
-<div id="loginScreen">
-<div class="login-card">
-<div class="login-logo">🏭</div>
-<h2 class="login-title">Linha 06 LP</h2>
-<p class="login-subtitle">Controle de Produção</p>
-<input type="text" id="loginUser" class="login-input" placeholder="Usuário" autocomplete="username">
-<input type="password" id="loginPass" class="login-input" placeholder="Senha" autocomplete="current-password" onkeypress="handleLoginKeyPress(event)">
-<button class="login-btn" onclick="doLogin()">🔐 Entrar</button>
-<p class="login-error" id="loginError">Usuário ou senha incorretos!</p>
-</div>
-</div>
-
-<!-- ===== APP PRINCIPAL ===== -->
-<div id="appScreen">
-<header>
-<!-- LADO ESQUERDO - LOGO CARREGADEIRA -->
-<div class="header-left">
-<img src="./img/carregadeira.jpg" alt="Logo Carregadeira" class="header-logo">
-</div>
-
-<!-- CENTRO - TÍTULO -->
-<div class="header-center">
-<h1>🏭 Linha 06 LP</h1>
-<p>Controle de Produção - Firebase Cloud</p>
-</div>
-
-<!-- LADO DIREITO - AÇÕES -->
-<div class="header-actions">
-<span class="user-info">👤 <span id="currentUser">Usuário</span></span>
-<button class="btn-logout" onclick="doLogout()">🚪 Sair</button>
-</div>
-
-<!-- STATUS DE SALVAMENTO -->
-<div class="save-status">
-<div class="save-dot"></div>
-<span id="saveText">✅ Salvo na Nuvem</span>
-</div>
-</header>
-
-<div class="container">
-<!-- Barra de Estatísticas -->
-<div class="stats-bar">
-<div class="stat-item stat-item-with-btn">
-<div>
-<div class="stat-number" id="totalMachines">0</div>
-<div class="stat-label">Total de Máquinas Feitas</div>
-</div>
-<button class="btn btn-reset-small" onclick="showResetModal()" id="btnResetTotal" title="Zerar Total">🔄 Zerar</button>
-</div>
-<div class="stat-item">
-<div class="stat-number" id="todayMachines">0</div>
-<div class="stat-label">Máquinas Produzidas Hoje</div>
-</div>
-<div class="stat-item">
-<div class="stat-number" id="storageStatus">OK</div>
-<div class="stat-label">Firebase</div>
-</div>
-</div>
-
-<!-- Filtro de Data -->
-<div class="date-filter-panel">
-<div class="filter-group">
-<label for="filterDate">📅 Visualizar Dia:</label>
-<input type="date" id="filterDate" onchange="renderMachines()">
-</div>
-<div style="font-size: 0.9rem; color: #7f8c8d;">
-* Todas as máquinas do dia selecionado
-</div>
-</div>
-
-<!-- Formulário de Entrada -->
-<div class="input-panel">
-<div class="form-section">
-<h3>📅 Data do Trabalho</h3>
-<div class="form-grid">
-<div class="form-group">
-<label for="workDate">Dia Trabalhado</label>
-<input type="date" id="workDate">
-</div>
-</div>
-</div>
-
-<div class="form-section">
-<h3>📋 Identificação da Máquina</h3>
-<div class="form-grid">
-<div class="form-group">
-<label for="machineModel">Modelo da Máquina</label>
-<select id="machineModel">
-<option value="">Selecione o modelo...</option>
-<option value="TN2">TN2</option>
-<option value="TN3-GC">TN3-GC</option>
-<option value="LN6">LN6</option>
-<option value="J8R">J8R</option>
-<option value="E5F-XE">E5F-XE</option>
-<option value="TN7-GC">TN7-GC</option>
-<option value="FL6-XE">FL6-XE</option>
-<option value="CXS-80">CXS-80</option>
-</select>
-</div>
-<div class="form-group">
-<label for="machineNumber">Número da Máquina</label>
-<input type="text" id="machineNumber" class="machine-number-input" placeholder="Ex: 001, 015, A-12">
-</div>
-</div>
-</div>
-
-<div class="form-section">
-<h3>👥 Operadores - Posições Principais</h3>
-<div class="form-grid">
-<div class="form-group">
-<label for="opRight">🔴 Lado Direito</label>
-<select id="opRight" class="operator-select" onchange="checkCustomOperator(this, 'customRight')">
-<option value="">Selecione o operador...</option>
-<option value="Willians">Willians</option>
-<option value="Moi">Moi</option>
-<option value="Carrera">Carrera</option>
-<option value="Caua">Caua</option>
-<option value="Ulisse">Ulisse</option>
-<option value="outro">➕ Outro (digitar nome)</option>
-</select>
-<input type="text" id="customRight" class="custom-operator" placeholder="Digite o nome do operador">
-</div>
-<div class="form-group">
-<label for="opLeft">🟣 Lado Esquerdo</label>
-<select id="opLeft" class="operator-select" onchange="checkCustomOperator(this, 'customLeft')">
-<option value="">Selecione o operador...</option>
-<option value="Willians">Willians</option>
-<option value="Moi">Moi</option>
-<option value="Carrera">Carrera</option>
-<option value="Caua">Caua</option>
-<option value="Ulisse">Ulisse</option>
-<option value="outro">➕ Outro (digitar nome)</option>
-</select>
-<input type="text" id="customLeft" class="custom-operator" placeholder="Digite o nome do operador">
-</div>
-<div class="form-group">
-<label for="opBackRight">🟠 Trás Direito</label>
-<select id="opBackRight" class="operator-select" onchange="checkCustomOperator(this, 'customBackRight')">
-<option value="">Selecione o operador...</option>
-<option value="Willians">Willians</option>
-<option value="Moi">Moi</option>
-<option value="Carrera">Carrera</option>
-<option value="Caua">Caua</option>
-<option value="Ulisse">Ulisse</option>
-<option value="outro">➕ Outro (digitar nome)</option>
-</select>
-<input type="text" id="customBackRight" class="custom-operator" placeholder="Digite o nome do operador">
-</div>
-<div class="form-group">
-<label for="opBackLeft">🟢 Trás Esquerdo</label>
-<select id="opBackLeft" class="operator-select" onchange="checkCustomOperator(this, 'customBackLeft')">
-<option value="">Selecione o operador...</option>
-<option value="Willians">Willians</option>
-<option value="Moi">Moi</option>
-<option value="Carrera">Carrera</option>
-<option value="Caua">Caua</option>
-<option value="Ulisse">Ulisse</option>
-<option value="outro">➕ Outro (digitar nome)</option>
-</select>
-<input type="text" id="customBackLeft" class="custom-operator" placeholder="Digite o nome do operador">
-</div>
-</div>
-</div>
-
-<div class="form-section">
-<h3>🔧 Montar Auto Lub</h3>
-<div class="form-grid">
-<div class="form-group">
-<label for="opAutoLubRight">🔵 Auto Lub Lado Direito</label>
-<select id="opAutoLubRight" class="operator-select" onchange="checkCustomOperator(this, 'customAutoLubRight')">
-<option value="">Selecione o operador...</option>
-<option value="Willians">Willians</option>
-<option value="Moi">Moi</option>
-<option value="Carrera">Carrera</option>
-<option value="Caua">Caua</option>
-<option value="Ulisse">Ulisse</option>
-<option value="outro">➕ Outro (digitar nome)</option>
-</select>
-<input type="text" id="customAutoLubRight" class="custom-operator" placeholder="Digite o nome do operador">
-</div>
-<div class="form-group">
-<label for="opAutoLubLeft">🟢 Auto Lub Lado Esquerdo</label>
-<select id="opAutoLubLeft" class="operator-select" onchange="checkCustomOperator(this, 'customAutoLubLeft')">
-<option value="">Selecione o operador...</option>
-<option value="Willians">Willians</option>
-<option value="Moi">Moi</option>
-<option value="Carrera">Carrera</option>
-<option value="Caua">Caua</option>
-<option value="Ulisse">Ulisse</option>
-<option value="outro">➕ Outro (digitar nome)</option>
-</select>
-<input type="text" id="customAutoLubLeft" class="custom-operator" placeholder="Digite o nome do operador">
-</div>
-</div>
-</div>
-
-<button class="btn btn-add" onclick="addMachine()" id="btnAddMachine">
-✅ ADICIONAR MÁQUINA À LINHA
-</button>
-</div>
-
-<!-- Lista de Máquinas -->
-<div id="machinesList" class="machines-container"></div>
-</div>
-
-<!-- Modal de Senha Admin para Zerar - CORRIGIDO -->
-<div class="modal-overlay" id="resetModal">
-<div class="modal-content">
-<div class="lock-icon">🔄</div>
-<div class="modal-title">Zerar Total de Máquinas</div>
-<p style="color: #7f8c8d; margin-bottom: 15px; font-size: 0.9rem;">Digite a senha de administrador para zerar o contador</p>
-<input type="password" id="resetPassword" class="modal-input" placeholder="Senha" onkeypress="handleResetKeyPress(event)">
-<div class="modal-error" id="resetError">Senha incorreta!</div>
-<div class="modal-buttons">
-<button class="modal-btn modal-btn-cancel" onclick="closeResetModal()">Cancelar</button>
-<button class="modal-btn modal-btn-confirm" onclick="verifyResetPassword()">Confirmar</button>
-</div>
-</div>
-</div>
-
-<!-- Status Firebase -->
-<div class="firebase-status" id="firebaseStatus">
-<span id="firebaseStatusText">🔄 Conectando...</span>
-</div>
-</div>
-
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-<script>
-// ============================================
-// CONFIGURAÇÃO DE USUÁRIOS E SENHAS
-// ============================================
-const USERS = {
-'operador': 'b3BlcmFkb3IxMjM=',  // operador123
-'admin': 'YWRtaW4yMDI0'           // admin2024
-};
-
-// ============================================
-// CONFIGURAÇÃO DO FIREBASE
-// ============================================
-const firebaseConfig = {
-apiKey: "AIzaSyCYII9KS9Sro0h_pmiXErAVi_42qeq4WlE",
-authDomain: "lp-34197.firebaseapp.com",
-projectId: "lp-34197",
-storageBucket: "lp-34197.firebasestorage.app",
-messagingSenderId: "1005341356831",
-appId: "1:1005341356831:web:96a8d7a8fc51311d04762a"
-};
-
-let db;
-let firebaseInitialized = false;
-let currentUser = null;
-
-try {
-firebase.initializeApp(firebaseConfig);
-db = firebase.firestore();
-firebaseInitialized = true;
-updateFirebaseStatus(true, '✅ Conectado');
-} catch (error) {
-console.error('❌ Erro Firebase:', error);
-updateFirebaseStatus(false, '❌ Erro');
-}
-
-// ============================================
-// VARIÁVEIS GLOBAIS
-// ============================================
-let machinesData = [];
-const COLLECTION_NAME = 'maquinas_linha06';
-
-// ============================================
-// INICIALIZAÇÃO
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-const savedUser = localStorage.getItem('linha06_user');
-if (savedUser) {
-currentUser = savedUser;
-showApp();
-setTodayDate();
-if (firebaseInitialized) loadData();
-updateStats();
-}
-});
-
-// ============================================
-// FUNÇÕES DE LOGIN
-// ============================================
-function handleLoginKeyPress(event) {
-if (event.key === 'Enter') doLogin();
-}
-
-function doLogin() {
-const user = document.getElementById('loginUser').value.trim();
-const pass = document.getElementById('loginPass').value;
-const errorEl = document.getElementById('loginError');
-
-if (USERS[user] && atob(USERS[user]) === pass) {
-currentUser = user;
-localStorage.setItem('linha06_user', user);
-document.getElementById('loginScreen').classList.add('hidden');
-document.getElementById('appScreen').classList.add('visible');
-document.getElementById('currentUser').textContent = user === 'admin' ? 'Administrador' : 'Operador';
-setTodayDate();
-if (firebaseInitialized) loadData();
-updateStats();
-} else {
-errorEl.classList.add('show');
-document.getElementById('loginPass').value = '';
-document.getElementById('loginPass').focus();
-}
-}
-
-function doLogout() {
-if (confirm('Deseja realmente sair?')) {
-currentUser = null;
-localStorage.removeItem('linha06_user');
-document.getElementById('loginScreen').classList.remove('hidden');
-document.getElementById('appScreen').classList.remove('visible');
-document.getElementById('loginUser').value = '';
-document.getElementById('loginPass').value = '';
-document.getElementById('loginError').classList.remove('show');
-}
-}
-
-function showApp() {
-document.getElementById('loginScreen').classList.add('hidden');
-document.getElementById('appScreen').classList.add('visible');
-}
-
-// ============================================
-// FUNÇÕES DO APP
-// ============================================
-function updateFirebaseStatus(connected, message) {
-const statusEl = document.getElementById('firebaseStatus');
-const statusTextEl = document.getElementById('firebaseStatusText');
-statusEl.className = 'firebase-status ' + (connected ? 'connected' : 'error');
-statusTextEl.textContent = message;
-}
-
-function setTodayDate() {
-const today = new Date();
-const year = today.getFullYear();
-const month = String(today.getMonth() + 1).padStart(2, '0');
-const day = String(today.getDate()).padStart(2, '0');
-const todayString = year + '-' + month + '-' + day;
-
-document.getElementById('workDate').value = todayString;
-document.getElementById('filterDate').value = todayString;
-}
-
-function checkCustomOperator(selectElement, customInputId) {
-const customInput = document.getElementById(customInputId);
-if (selectElement.value === 'outro') {
-customInput.classList.add('show');
-customInput.focus();
-} else {
-customInput.classList.remove('show');
-customInput.value = '';
-}
-}
-
-function getOperatorValue(selectId, customInputId) {
-const select = document.getElementById(selectId);
-const customInput = document.getElementById(customInputId);
-
-if (select.value === 'outro' && customInput.value.trim() !== '') {
-return customInput.value.trim();
-} else if (select.value !== '' && select.value !== 'outro') {
-return select.value;
-}
-return 'Não atribuído';
-}
-
-// ============================================
-// MODAL PARA ZERAR TOTAL - CORRIGIDO
-// ============================================
-function showResetModal() {
-console.log('🔍 showResetModal chamado');
-console.log('currentUser:', currentUser);
-
-if (currentUser !== 'admin') {
-alert('⚠️ Apenas administradores podem zerar o total!\n\nFaça login como admin para continuar.\n\nUsuário: admin\nSenha: admin2024');
-return;
-}
-
-const modal = document.getElementById('resetModal');
-console.log('Modal elemento:', modal);
-
-if (!modal) {
-alert('❌ Erro: Modal não encontrado no HTML!');
-return;
-}
-
-// ✅ CORREÇÃO: Usar classList.add E style.display
-modal.classList.add('active');
-modal.style.display = 'flex';
-
-console.log('✅ Modal ativado');
-console.log('Modal classes:', modal.classList);
-console.log('Modal display:', window.getComputedStyle(modal).display);
-
-document.getElementById('resetPassword').value = '';
-document.getElementById('resetError').style.display = 'none';
-setTimeout(() => {
-document.getElementById('resetPassword').focus();
-}, 100);
-}
-
-function closeResetModal() {
-const modal = document.getElementById('resetModal');
-modal.classList.remove('active');
-modal.style.display = 'none';
-document.getElementById('resetPassword').value = '';
-document.getElementById('resetError').style.display = 'none';
-}
-
-function handleResetKeyPress(event) {
-if (event.key === 'Enter') {
-verifyResetPassword();
-}
-}
-
-function verifyResetPassword() {
-const enteredPass = document.getElementById('resetPassword').value;
-const adminPass = atob(USERS['admin']);
-
-console.log('Senha digitada:', enteredPass);
-console.log('Senha esperada:', adminPass);
-
-if (enteredPass === adminPass) {
-closeResetModal();
-resetTotalMachines();
-} else {
-document.getElementById('resetError').style.display = 'block';
-document.getElementById('resetPassword').value = '';
-document.getElementById('resetPassword').focus();
-}
-}
-
-// ============================================
-// ZERAR TOTAL DE MÁQUINAS
-// ============================================
-async function resetTotalMachines() {
-if (!firebaseInitialized) {
-alert('❌ Firebase não conectado!');
-return;
-}
-
-const confirmacao = confirm(
-'⚠️ ATENÇÃO:\n\n' +
-'Isso apagará TODAS as máquinas registradas.\n\n' +
-'O total voltará para ZERO.\n\n' +
-'Tem certeza que deseja continuar?'
-);
-
-if (!confirmacao) {
-return;
-}
-
-try {
-document.getElementById('btnResetTotal').disabled = true;
-document.getElementById('btnResetTotal').textContent = '⏳...';
-
-const snapshot = await db.collection(COLLECTION_NAME).get();
-
-if (snapshot.empty) {
-alert('ℹ️ Não há dados para zerar.');
-document.getElementById('btnResetTotal').disabled = false;
-document.getElementById('btnResetTotal').textContent = '🔄 Zerar';
-return;
-}
-
-console.log('🗑️ Excluindo', snapshot.size, 'máquinas...');
-
-const batch = db.batch();
-snapshot.forEach(doc => {
-batch.delete(doc.ref);
-});
-
-await batch.commit();
-
-console.log('✅ Total zerado com sucesso!');
-
-machinesData = [];
-renderMachines();
-updateStats();
-
-alert('✅ Total de máquinas zerado com sucesso!');
-
-} catch (error) {
-console.error('❌ Erro ao zerar:', error);
-alert('❌ Erro ao zerar total:\n\n' + error.message);
-} finally {
-document.getElementById('btnResetTotal').disabled = false;
-document.getElementById('btnResetTotal').textContent = '🔄 Zerar';
-}
-}
-
-// ============================================
-// CRUD MÁQUINAS
-// ============================================
-async function addMachine() {
-const model = document.getElementById('machineModel').value;
-const machineNumber = document.getElementById('machineNumber').value.trim();
-const workDate = document.getElementById('workDate').value;
-
-if (!model || model === '') {
-alert('⚠️ ERRO: Selecione um modelo de máquina!');
-return false;
-}
-if (!machineNumber || machineNumber === '') {
-alert('⚠️ ERRO: Digite o número da máquina!');
-document.getElementById('machineNumber').focus();
-return false;
-}
-if (!workDate || workDate === '') {
-alert('⚠️ ERRO: Selecione a data de trabalho!');
-return false;
-}
-
-const machineData = {
-model: model,
-number: machineNumber,
-date: workDate,
-timestamp: new Date().toLocaleString('pt-BR'),
-addedBy: currentUser,
-createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-positions: {
-right: getOperatorValue('opRight', 'customRight'),
-left: getOperatorValue('opLeft', 'customLeft'),
-backRight: getOperatorValue('opBackRight', 'customBackRight'),
-backLeft: getOperatorValue('opBackLeft', 'customBackLeft'),
-autoLubRight: getOperatorValue('opAutoLubRight', 'customAutoLubRight'),
-autoLubLeft: getOperatorValue('opAutoLubLeft', 'customAutoLubLeft')
-}
-};
-
-try {
-document.getElementById('btnAddMachine').disabled = true;
-document.getElementById('btnAddMachine').textContent = '⏳ Salvando...';
-
-await db.collection(COLLECTION_NAME).add(machineData);
-
-document.getElementById('machineModel').value = '';
-document.getElementById('machineNumber').value = '';
-
-['opRight', 'opLeft', 'opBackRight', 'opBackLeft', 'opAutoLubRight', 'opAutoLubLeft'].forEach(id => {
-document.getElementById(id).value = '';
-});
-['customRight', 'customLeft', 'customBackRight', 'customBackLeft', 'customAutoLubRight', 'customAutoLubLeft'].forEach(id => {
-const input = document.getElementById(id);
-input.value = '';
-input.classList.remove('show');
-});
-
-await loadData();
-updateStats();
-alert('✅ Máquina ' + model + ' Nº ' + machineNumber + ' salva com sucesso!');
-
-} catch (error) {
-console.error('❌ Erro:', error);
-alert('Erro ao salvar: ' + error.message);
-} finally {
-document.getElementById('btnAddMachine').disabled = false;
-document.getElementById('btnAddMachine').textContent = '✅ ADICIONAR MÁQUINA À LINHA';
-}
-return true;
-}
-
-async function loadData() {
-if (!firebaseInitialized) return;
-try {
-const snapshot = await db.collection(COLLECTION_NAME).orderBy('createdAt', 'desc').get();
-machinesData = [];
-snapshot.forEach(doc => {
-machinesData.push({ id: doc.id, ...doc.data() });
-});
-renderMachines();
-updateStats();
-} catch (error) {
-console.error('❌ Erro ao carregar:', error);
-}
-}
-
-function renderMachines() {
-const listContainer = document.getElementById('machinesList');
-const filterDate = document.getElementById('filterDate').value;
-
-listContainer.innerHTML = '';
-
-let filtered = machinesData.filter(m => m.date === filterDate);
-
-if (filtered.length === 0) {
-listContainer.innerHTML = '<div class="empty-state"><h3>📭 Nenhuma máquina registrada neste dia</h3><p>Adicione uma nova máquina para este dia.</p></div>';
-return;
-}
-
-filtered.forEach((machine, index) => {
-const dateParts = machine.date.split('-');
-const formattedDate = dateParts[2] + '/' + dateParts[1] + '/' + dateParts[0];
-
-const card = document.createElement('div');
-card.className = 'machine-card';
-card.innerHTML =
-'<div class="machine-header">' +
-'<div class="machine-info">' +
-'<span class="machine-model">' + machine.model + '</span>' +
-'<span class="machine-number">Nº ' + machine.number + '</span>' +
-'</div>' +
-'<div class="machine-date-badge">📅 ' + formattedDate + '</div>' +
-'</div>' +
-'<div class="machine-body">' +
-'<div class="section-title">👥 Posições Principais</div>' +
-'<div class="operator-grid">' +
-'<div class="operator-item pos-right"><div class="operator-label"><span class="badge badge-right">DIREITO</span></div><div class="operator-name">' + machine.positions.right + '</div></div>' +
-'<div class="operator-item pos-left"><div class="operator-label"><span class="badge badge-left">ESQUERDO</span></div><div class="operator-name">' + machine.positions.left + '</div></div>' +
-'<div class="operator-item pos-back-right"><div class="operator-label"><span class="badge badge-back">TRÁS DIR</span></div><div class="operator-name">' + machine.positions.backRight + '</div></div>' +
-'<div class="operator-item pos-back-left"><div class="operator-label"><span class="badge badge-back">TRÁS ESQ</span></div><div class="operator-name">' + machine.positions.backLeft + '</div></div>' +
-'</div>' +
-'<div class="section-title">🔧 Montar Auto Lub</div>' +
-'<div class="operator-grid">' +
-'<div class="operator-item pos-autolub-right"><div class="operator-label"><span class="badge badge-autolub">AUTO LUB DIR</span></div><div class="operator-name">' + machine.positions.autoLubRight + '</div></div>' +
-'<div class="operator-item pos-autolub-left"><div class="operator-label"><span class="badge badge-autolub">AUTO LUB ESQ</span></div><div class="operator-name">' + machine.positions.autoLubLeft + '</div></div>' +
-'</div>' +
-'</div>' +
-'<div class="actions"><button class="btn btn-delete" onclick="deleteMachine(\'' + machine.id + '\')">🗑️ Remover</button></div>';
-
-listContainer.appendChild(card);
-});
-}
-
-async function deleteMachine(id) {
-if (confirm('Deseja realmente remover esta máquina?')) {
-try {
-await db.collection(COLLECTION_NAME).doc(id).delete();
-await loadData();
-updateStats();
-} catch (error) {
-alert('Erro ao remover: ' + error.message);
-}
-}
-}
-
-function updateStats() {
-const total = machinesData.length;
-const today = document.getElementById('filterDate').value;
-const todayCount = machinesData.filter(m => m.date === today).length;
-
-document.getElementById('totalMachines').innerText = total;
-document.getElementById('todayMachines').innerText = todayCount;
-document.getElementById('storageStatus').innerText = firebaseInitialized ? 'OK' : 'ERRO';
-document.getElementById('storageStatus').style.color = firebaseInitialized ? '#27ae60' : '#e74c3c';
-}
-</script>
+    <!-- TELA DE LOGIN -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">🏭✨</div>
+            <h2 class="login-title">Linha 06 LP</h2>
+            <p class="login-subtitle">Controle de Produção • Firebase Cloud ☁️</p>
+            <input type="text" id="loginUser" class="login-input" placeholder="👤 Usuário" autocomplete="username" maxlength="20">
+            <input type="password" id="loginPass" class="login-input" placeholder="🔐 Senha" onkeypress="handleLoginKeyPress(event)" autocomplete="current-password">
+            <button class="login-btn" onclick="doLogin()">✅ Entrar no Sistema</button>
+            <p class="login-error" id="loginError">⚠️ Usuário ou senha incorretos!</p>
+            <p style="margin-top:20px;font-size:0.8rem;color:#95a5a6;">💡 Dica: <strong>operador</strong>/<strong>operador123</strong> ou <strong>admin</strong>/<strong>admin2024</strong></p>
+        </div>
+    </div>
+
+    <!-- APP PRINCIPAL -->
+    <div id="appScreen">
+        <header>
+            <div class="header-left">
+                <img src="./img/carregadeira.jpg" alt="Logo Linha 06" class="header-logo" 
+                     onerror="this.src='https://via.placeholder.com/80?text=🚜&bg=667eea&fg=fff'">
+            </div>
+            <div class="header-center">
+                <h1>🏭 Linha 06 LP</h1>
+                <p>Controle de Produção • 6 Posições de Operadores 🎯</p>
+            </div>
+            <div class="header-actions">
+                <span class="user-info">👤 <span id="currentUser">Usuário</span></span>
+                <button class="btn-logout" onclick="doLogout()" title="Sair do sistema">🚪 Sair</button>
+            </div>
+            <div class="save-status" id="saveStatus">
+                <div class="save-dot"></div>
+                <span id="saveText">✅ Salvo na Nuvem</span>
+            </div>
+        </header>
+
+        <div class="container">
+            <!-- Barra de Estatísticas (Total removido) -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-number" id="todayMachines">0</div>
+                    <div class="stat-label">📅 Produzidas Hoje</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="storageStatus">☁️ OK</div>
+                    <div class="stat-label">Firebase</div>
+                </div>
+            </div>
+
+            <!-- Filtro de Data -->
+            <div class="date-filter-panel">
+                <div class="filter-group">
+                    <label for="filterDate">📅 Visualizar Dia:</label>
+                    <input type="date" id="filterDate" onchange="renderMachines()" max="">
+                </div>
+            </div>
+
+            <!-- Painel de Cadastro -->
+            <div class="input-panel">
+                <div class="form-section">
+                    <h3>📅 Data do Trabalho</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="workDate">🗓️ Dia Trabalhado</label>
+                            <input type="date" id="workDate" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>📋 Identificação da Máquina</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="machineModel">⚙️ Modelo da Máquina</label>
+                            <select id="machineModel" required>
+                                <option value="">Selecione um modelo...</option>
+                                <option value="TN2">TN2</option>
+                                <option value="TN3-GC">TN3-GC</option>
+                                <option value="LN6">LN6</option>
+                                <option value="J8R">J8R</option>
+                                <option value="E5F-XE">E5F-XE</option>
+                                <option value="TN7-GC">TN7-GC</option>
+                                <option value="FL6-XE">FL6-XE</option>
+                                <option value="CXS-80">CXS-80</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="machineNumber">🔢 Número da Máquina</label>
+                            <input type="text" id="machineNumber" placeholder="Ex: 001, 042..." maxlength="10" pattern="[0-9]+" title="Apenas números" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>👥 Operadores - Posições Frontais</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="opRight">🔴 Lado Direito</label>
+                            <select id="opRight" onchange="checkCustomOperator(this, 'customRight')" required>
+                                <option value="">Selecione...</option>
+                                <option value="Willians">Willians</option>
+                                <option value="Moi">Moi</option>
+                                <option value="Carrera">Carrera</option>
+                                <option value="Caua">Caua</option>
+                                <option value="Ulisse">Ulisse</option>
+                                <option value="outro">➕ Outro</option>
+                            </select>
+                            <input type="text" id="customRight" class="custom-operator" placeholder="✍️ Nome do operador..." maxlength="50">
+                        </div>
+                        <div class="form-group">
+                            <label for="opLeft">🟣 Lado Esquerdo</label>
+                            <select id="opLeft" onchange="checkCustomOperator(this, 'customLeft')" required>
+                                <option value="">Selecione...</option>
+                                <option value="Willians">Willians</option>
+                                <option value="Moi">Moi</option>
+                                <option value="Carrera">Carrera</option>
+                                <option value="Caua">Caua</option>
+                                <option value="Ulisse">Ulisse</option>
+                                <option value="outro">➕ Outro</option>
+                            </select>
+                            <input type="text" id="customLeft" class="custom-operator" placeholder="✍️ Nome do operador..." maxlength="50">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>🔙 Operadores - Posições Traseiras</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="opBackRight">🟠 Trás Direito</label>
+                            <select id="opBackRight" onchange="checkCustomOperator(this, 'customBackRight')" required>
+                                <option value="">Selecione...</option>
+                                <option value="Willians">Willians</option>
+                                <option value="Moi">Moi</option>
+                                <option value="Carrera">Carrera</option>
+                                <option value="Caua">Caua</option>
+                                <option value="Ulisse">Ulisse</option>
+                                <option value="outro">➕ Outro</option>
+                            </select>
+                            <input type="text" id="customBackRight" class="custom-operator" placeholder="✍️ Nome do operador..." maxlength="50">
+                        </div>
+                        <div class="form-group">
+                            <label for="opBackLeft">🟦 Trás Esquerdo</label>
+                            <select id="opBackLeft" onchange="checkCustomOperator(this, 'customBackLeft')" required>
+                                <option value="">Selecione...</option>
+                                <option value="Willians">Willians</option>
+                                <option value="Moi">Moi</option>
+                                <option value="Carrera">Carrera</option>
+                                <option value="Caua">Caua</option>
+                                <option value="Ulisse">Ulisse</option>
+                                <option value="outro">➕ Outro</option>
+                            </select>
+                            <input type="text" id="customBackLeft" class="custom-operator" placeholder="✍️ Nome do operador..." maxlength="50">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>🔧 Operadores - Auto Lubrificação</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="opAutoLubRight">🔵 Auto Lub Direito</label>
+                            <select id="opAutoLubRight" onchange="checkCustomOperator(this, 'customAutoLubRight')" required>
+                                <option value="">Selecione...</option>
+                                <option value="Willians">Willians</option>
+                                <option value="Moi">Moi</option>
+                                <option value="Carrera">Carrera</option>
+                                <option value="Caua">Caua</option>
+                                <option value="Ulisse">Ulisse</option>
+                                <option value="outro">➕ Outro</option>
+                            </select>
+                            <input type="text" id="customAutoLubRight" class="custom-operator" placeholder="✍️ Nome do operador..." maxlength="50">
+                        </div>
+                        <div class="form-group">
+                            <label for="opAutoLubLeft">🟢 Auto Lub Esquerdo</label>
+                            <select id="opAutoLubLeft" onchange="checkCustomOperator(this, 'customAutoLubLeft')" required>
+                                <option value="">Selecione...</option>
+                                <option value="Willians">Willians</option>
+                                <option value="Moi">Moi</option>
+                                <option value="Carrera">Carrera</option>
+                                <option value="Caua">Caua</option>
+                                <option value="Ulisse">Ulisse</option>
+                                <option value="outro">➕ Outro</option>
+                            </select>
+                            <input type="text" id="customAutoLubLeft" class="custom-operator" placeholder="✍️ Nome do operador..." maxlength="50">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-add" onclick="addMachine()" id="btnAddMachine">
+                    ✅ ADICIONAR MÁQUINA À LINHA 🚀
+                </button>
+            </div>
+
+            <!-- Lista de Máquinas -->
+            <div id="machinesList" class="machines-container"></div>
+        </div>
+
+        <!-- Modal de Reset (Admin) -->
+        <div class="modal-overlay" id="resetModal" role="dialog" aria-modal="true">
+            <div class="modal-content">
+                <h3 class="modal-title">⚠️ Zerar Todos os Registros</h3>
+                <p style="margin-bottom:15px;color:#7f8c8d;font-size:0.9rem;">Esta ação é irreversível!</p>
+                <input type="password" id="resetPassword" class="modal-input" placeholder="🔐 Senha do Admin">
+                <div class="modal-error" id="resetError">❌ Senha incorreta!</div>
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-btn-cancel" onclick="closeResetModal()">❌ Cancelar</button>
+                    <button class="modal-btn modal-btn-confirm" onclick="verifyResetPassword()">✅ Confirmar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Firebase -->
+        <div class="firebase-status" id="firebaseStatus">
+            <span id="firebaseStatusText">🔄 Conectando...</span>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts (URLs corrigidas) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ===== CONFIGURAÇÕES =====
+        const USERS = { 
+            'operador': 'b3BlcmFkb3IxMjM=',
+            'admin': 'YWRtaW4yMDI0'
+        };
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYII9KS9Sro0h_pmiXErAVi_42qeq4WlE",
+            authDomain: "lp-34197.firebaseapp.com",
+            projectId: "lp-34197",
+            storageBucket: "lp-34197.firebasestorage.app",
+            messagingSenderId: "1005341356831",
+            appId: "1:1005341356831:web:96a8d7a8fc51311d04762a"
+        };
+
+        // ===== VARIÁVEIS =====
+        let db, firebaseInitialized = false, currentUser = null;
+        let machinesData = [], isLoading = false;
+        const COLLECTION_NAME = 'maquinas_linha06';
+
+        // ===== FIREBASE =====
+        function initFirebase() {
+            try {
+                if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                db.enablePersistence().catch(() => {});
+                firebaseInitialized = true;
+                updateFirebaseStatus('connected', '✅ Conectado');
+                return true;
+            } catch (e) {
+                console.error('Firebase Error:', e);
+                updateFirebaseStatus('error', '❌ Erro');
+                showToast('❌ Erro ao conectar com Firebase', 'error');
+                return false;
+            }
+        }
+
+        // ===== UTILITÁRIOS =====
+        function showToast(msg, type = 'success') {
+            document.querySelector('.toast')?.remove();
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${msg}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, 20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function updateFirebaseStatus(status, msg) {
+            const el = document.getElementById('firebaseStatus');
+            el.className = `firebase-status ${status}`;
+            document.getElementById('firebaseStatusText').textContent = msg;
+            const stat = document.getElementById('storageStatus');
+            stat.textContent = status === 'connected' ? '☁️ OK' : status === 'error' ? '❌ OFF' : '🔄...';
+            stat.style.color = status === 'connected' ? '#27ae60' : status === 'error' ? '#e74c3c' : '#f39c12';
+        }
+
+        function updateSaveStatus(saving = false) {
+            const dot = document.querySelector('.save-dot');
+            const text = document.getElementById('saveText');
+            if (saving) {
+                dot.style.backgroundColor = '#f39c12';
+                dot.style.animation = 'none';
+                text.textContent = '💾 Salvando...';
+            } else {
+                dot.style.backgroundColor = '#2ecc71';
+                dot.style.animation = 'pulse 2s infinite';
+                text.textContent = '✅ Salvo na Nuvem';
+            }
+        }
+
+        function setTodayDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('workDate').value = today;
+            document.getElementById('filterDate').value = today;
+            document.getElementById('filterDate').max = today;
+        }
+
+        function formatBRDate(dateStr) {
+            if (!dateStr) return '';
+            const [y, m, d] = dateStr.split('-');
+            return `${d}/${m}/${y}`;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ===== VALIDAÇÃO =====
+        function validateForm() {
+            const model = document.getElementById('machineModel').value;
+            const number = document.getElementById('machineNumber').value.trim();
+            const workDate = document.getElementById('workDate').value;
+            
+            if (!model) { showToast('⚠️ Selecione o modelo', 'error'); return false; }
+            if (!number || !/^\d+$/.test(number)) { showToast('⚠️ Número deve conter apenas dígitos', 'error'); return false; }
+            if (!workDate) { showToast('⚠️ Selecione a data', 'error'); return false; }
+            
+            // Valida todas as 6 posições
+            const positions = ['opRight','opLeft','opBackRight','opBackLeft','opAutoLubRight','opAutoLubLeft'];
+            const customs = ['customRight','customLeft','customBackRight','customBackLeft','customAutoLubRight','customAutoLubLeft'];
+            
+            for (let i = 0; i < positions.length; i++) {
+                const val = getOpVal(positions[i], customs[i]);
+                if (val === 'Não atribuído') {
+                    showToast(`⚠️ Atribua operador para a posição ${i+1}`, 'error');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function checkCustomOperator(selectEl, customId) {
+            const custom = document.getElementById(customId);
+            if (selectEl.value === 'outro') {
+                custom.classList.add('show');
+                custom.required = true;
+                setTimeout(() => custom.focus(), 100);
+            } else {
+                custom.classList.remove('show');
+                custom.value = '';
+                custom.required = false;
+            }
+        }
+
+        function getOpVal(selectId, customId) {
+            const select = document.getElementById(selectId);
+            const custom = document.getElementById(customId);
+            return (select.value === 'outro' && custom.value.trim()) ? custom.value.trim() : (select.value || 'Não atribuído');
+        }
+
+        // ===== AUTENTICAÇÃO =====
+        function handleLoginKeyPress(e) { if (e.key === 'Enter') doLogin(); }
+
+        function doLogin() {
+            const user = document.getElementById('loginUser').value.trim().toLowerCase();
+            const pass = document.getElementById('loginPass').value;
+            const errorEl = document.getElementById('loginError');
+            
+            if (!user || !pass) {
+                errorEl.textContent = '⚠️ Preencha usuário e senha!';
+                errorEl.classList.add('show');
+                return;
+            }
+            if (USERS[user] && atob(USERS[user]) === pass) {
+                errorEl.classList.remove('show');
+                localStorage.setItem('linha06_user', user);
+                localStorage.setItem('linha06_login_time', Date.now().toString());
+                login(user);
+                showToast(`✅ Bem-vindo, ${user === 'admin' ? 'Administrador 👑' : 'Operador 👷'}!`, 'success');
+            } else {
+                errorEl.textContent = '❌ Usuário ou senha incorretos!';
+                errorEl.classList.add('show');
+                document.getElementById('loginPass').value = '';
+                document.getElementById('loginPass').focus();
+            }
+        }
+
+        function login(user) {
+            currentUser = user;
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.add('visible');
+            document.getElementById('currentUser').textContent = user === 'admin' ? 'Administrador 👑' : 'Operador 👷';
+            setTodayDate();
+            if (firebaseInitialized) loadData();
+            else showToast('⚠️ Aguardando conexão com Firebase...', 'warning');
+        }
+
+        function doLogout() {
+            if (confirm('🚪 Deseja sair do sistema?')) {
+                localStorage.removeItem('linha06_user');
+                localStorage.removeItem('linha06_login_time');
+                location.reload();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initFirebase();
+            const savedUser = localStorage.getItem('linha06_user');
+            const loginTime = localStorage.getItem('linha06_login_time');
+            if (savedUser && loginTime && (Date.now() - parseInt(loginTime) < 8 * 60 * 60 * 1000)) {
+                login(savedUser);
+            }
+        });
+
+        // ===== OPERAÇÕES COM DADOS =====
+        async function addMachine() {
+            if (isLoading || !validateForm() || !firebaseInitialized) return;
+            
+            isLoading = true;
+            updateSaveStatus(true);
+            
+            try {
+                const data = {
+                    model: document.getElementById('machineModel').value,
+                    number: document.getElementById('machineNumber').value.trim(),
+                    date: document.getElementById('workDate').value,
+                    addedBy: currentUser,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    timestamp: Date.now(),
+                    positions: {
+                        right: getOpVal('opRight', 'customRight'),
+                        left: getOpVal('opLeft', 'customLeft'),
+                        backRight: getOpVal('opBackRight', 'customBackRight'),
+                        backLeft: getOpVal('opBackLeft', 'customBackLeft'),
+                        autoLubRight: getOpVal('opAutoLubRight', 'customAutoLubRight'),
+                        autoLubLeft: getOpVal('opAutoLubLeft', 'customAutoLubLeft')
+                    }
+                };
+
+                await db.collection(COLLECTION_NAME).add(data);
+                
+                // Limpa formulário
+                ['machineNumber','machineModel','opRight','opLeft','opBackRight','opBackLeft','opAutoLubRight','opAutoLubLeft'].forEach(id => {
+                    document.getElementById(id).value = '';
+                });
+                ['customRight','customLeft','customBackRight','customBackLeft','customAutoLubRight','customAutoLubLeft'].forEach(id => {
+                    const el = document.getElementById(id);
+                    el.value = '';
+                    el.classList.remove('show');
+                });
+                
+                showToast('✅ Máquina adicionada com sucesso! 🎉', 'success');
+                await loadData();
+                
+            } catch (e) {
+                console.error('Erro ao adicionar:', e);
+                showToast('❌ Erro ao salvar. Verifique sua conexão.', 'error');
+            } finally {
+                isLoading = false;
+                updateSaveStatus(false);
+            }
+        }
+
+        async function loadData() {
+            if (!firebaseInitialized || isLoading) return;
+            isLoading = true;
+            try {
+                const snap = await db.collection(COLLECTION_NAME).orderBy('timestamp', 'desc').get();
+                machinesData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderMachines();
+                updateStats();
+            } catch (e) {
+                console.error('Erro ao carregar:', e);
+                showToast('⚠️ Erro ao carregar dados', 'warning');
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        function renderMachines() {
+            const list = document.getElementById('machinesList');
+            const filter = document.getElementById('filterDate').value;
+            list.innerHTML = '';
+            
+            const filtered = machinesData.filter(m => m.date === filter);
+            if (!filtered.length) {
+                list.innerHTML = `<div class="empty-state"><h3>📭 Nenhuma máquina registrada</h3><p>Cadastre uma nova máquina acima ✨</p></div>`;
+                return;
+            }
+
+            filtered.forEach(m => {
+                const p = m.positions || {};
+                const card = document.createElement('div');
+                card.className = 'machine-card';
+                card.innerHTML = `
+                    <div class="machine-header">
+                        <div class="machine-info">
+                            <span class="machine-model">${escapeHtml(m.model)}</span>
+                            <span class="machine-number">🔢 Nº ${escapeHtml(m.number)}</span>
+                        </div>
+                        <div class="machine-date-badge">📅 ${formatBRDate(m.date)}</div>
+                    </div>
+                    <div class="machine-body">
+                        <div class="section-title">👥 Operadores - 6 Posições</div>
+                        <div class="operator-grid">
+                            <div class="operator-item pos-right"><div class="operator-label">🔴 Direito</div><div class="operator-name">${escapeHtml(p.right)}</div></div>
+                            <div class="operator-item pos-left"><div class="operator-label">🟣 Esquerdo</div><div class="operator-name">${escapeHtml(p.left)}</div></div>
+                            <div class="operator-item pos-back-right"><div class="operator-label">🟠 Trás Direito</div><div class="operator-name">${escapeHtml(p.backRight)}</div></div>
+                            <div class="operator-item pos-back-left"><div class="operator-label">🟦 Trás Esquerdo</div><div class="operator-name">${escapeHtml(p.backLeft)}</div></div>
+                            <div class="operator-item pos-autolub-right"><div class="operator-label">🔵 Auto Lub Direito</div><div class="operator-name">${escapeHtml(p.autoLubRight)}</div></div>
+                            <div class="operator-item pos-autolub-left"><div class="operator-label">🟢 Auto Lub Esquerdo</div><div class="operator-name">${escapeHtml(p.autoLubLeft)}</div></div>
+                        </div>
+                        ${m.addedBy ? `<div style="margin-top:15px;font-size:0.8rem;color:#7f8c8d">👤 Por: <strong>${m.addedBy === 'admin' ? 'Admin' : 'Operador'}</strong></div>` : ''}
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-delete" onclick="deleteMachine('${m.id}')">🗑️ Excluir</button>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        async function deleteMachine(id) {
+            if (!confirm('🗑️ Excluir este registro?\n\nEsta ação não pode ser desfeita.')) return;
+            if (!firebaseInitialized) { showToast('❌ Firebase desconectado', 'error'); return; }
+            
+            try {
+                updateSaveStatus(true);
+                await db.collection(COLLECTION_NAME).doc(id).delete();
+                showToast('✅ Registro excluído', 'success');
+                await loadData();
+            } catch (e) {
+                console.error('Erro ao excluir:', e);
+                showToast('❌ Erro ao excluir', 'error');
+            } finally {
+                updateSaveStatus(false);
+            }
+        }
+
+        function updateStats() {
+            const today = new Date().toISOString().split('T')[0];
+            const count = machinesData.filter(m => m.date === today).length;
+            document.getElementById('todayMachines').textContent = count;
+            // Animação simples
+            const el = document.getElementById('todayMachines');
+            el.style.transform = 'scale(1.2)';
+            setTimeout(() => el.style.transform = 'scale(1)', 200);
+        }
+
+        // ===== MODAL ADMIN =====
+        function showResetModal() {
+            if (currentUser !== 'admin') { showToast('🔐 Apenas admin!', 'error'); return; }
+            document.getElementById('resetModal').classList.add('active');
+            document.getElementById('resetPassword').value = '';
+            document.getElementById('resetError').style.display = 'none';
+            document.getElementById('resetPassword').focus();
+        }
+        function closeResetModal() { document.getElementById('resetModal').classList.remove('active'); }
+        document.getElementById('resetModal')?.addEventListener('click', (e) => { if (e.target.id === 'resetModal') closeResetModal(); });
+
+        async function verifyResetPassword() {
+            const pass = document.getElementById('resetPassword').value;
+            const err = document.getElementById('resetError');
+            if (pass === atob(USERS['admin'])) {
+                if (confirm('⚠️ CONFIRMAÇÃO FINAL\n\nExcluir TODOS os registros?\n\nIRREVERSÍVEL!')) {
+                    try {
+                        updateSaveStatus(true);
+                        const snap = await db.collection(COLLECTION_NAME).get();
+                        const batch = db.batch();
+                        snap.forEach(doc => batch.delete(doc.ref));
+                        await batch.commit();
+                        showToast('✅ Todos os registros zerados!', 'success');
+                        closeResetModal();
+                        await loadData();
+                    } catch (e) {
+                        showToast('❌ Erro ao excluir', 'error');
+                    } finally {
+                        updateSaveStatus(false);
+                    }
+                }
+            } else {
+                err.style.display = 'block';
+                err.textContent = '❌ Senha incorreta!';
+                document.getElementById('resetPassword').value = '';
+                document.getElementById('resetPassword').focus();
+            }
+        }
+
+        // ===== UX =====
+        document.querySelectorAll('[required]').forEach(f => {
+            f.addEventListener('invalid', (e) => {
+                e.preventDefault();
+                f.style.borderColor = '#e74c3c';
+                f.addEventListener('input', () => f.style.borderColor = '', { once: true });
+            });
+        });
+    </script>
 </body>
 </html>
